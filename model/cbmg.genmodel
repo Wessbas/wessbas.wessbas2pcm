@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/src"
+    modelPluginID="org.fortiss.performance.javaee.pcm.model.generator.usagemodel"
+    modelName="Cbmg" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>cbmg.ecore</foreignModel>
+  <genPackages prefix="Cbmg" disposableProviderFactory="true" ecorePackage="cbmg.ecore#/">
+    <genClasses ecoreClass="cbmg.ecore#//State">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/requestURL"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/localAddr"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/port"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/localName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/isStartState"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//State/isEndState"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//State/outgoingTransitions"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//State/incomingTransitions"/>
+    </genClasses>
+    <genClasses ecoreClass="cbmg.ecore#//Transition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/method"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/probability"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/thinkTime"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/nbrOfTransitions"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/accept"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//Transition/condition"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//Transition/sourceState"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//Transition/targetState"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//Transition/requestParameter_transition"/>
+    </genClasses>
+    <genClasses ecoreClass="cbmg.ecore#//RequestParameter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//RequestParameter/parameterName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cbmg.ecore#//RequestParameter/parameterValue"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cbmg.ecore#//RequestParameter/transition_RequestParameter"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
