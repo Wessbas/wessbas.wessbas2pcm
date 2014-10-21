@@ -92,6 +92,7 @@ public class SystemCreator extends CreatorTools {
 					// assembly
 					createOperationProvidedRole(system, repository,
 							behaviorModel.getName());
+
 				}
 
 				systemResource.save(null);
@@ -223,12 +224,14 @@ public class SystemCreator extends CreatorTools {
 					assemblyConnector
 							.setRequiredRole_AssemblyConnector(operationRequiredRole);
 
-					// search components with provided role and than ad to the
+					// search components with provided role and than add to the
 					// new assemblyConnector
 					for (final RepositoryComponent componentRepositoryInstance : componentRepositorys) {
+
 						final EList<ProvidedRole> providedRoles = componentRepositoryInstance
 								.getProvidedRoles_InterfaceProvidingEntity();
 						for (final ProvidedRole providedRole : providedRoles) {
+
 							final OperationProvidedRole opr = (OperationProvidedRole) providedRole;
 							if (operationRequiredRole
 									.getRequiredInterface__OperationRequiredRole()
@@ -241,50 +244,47 @@ public class SystemCreator extends CreatorTools {
 								// assemblyConnector
 								assemblyConnector
 										.setProvidedRole_AssemblyConnector(opr);
-							}
-						}
-					}
 
-					final EList<AssemblyContext> assemblyContexts = system
-							.getAssemblyContexts__ComposedStructure();
-					for (final AssemblyContext assemblyContext : assemblyContexts) {
-						final RepositoryComponent repositoryComponentInstance = assemblyContext
-								.getEncapsulatedComponent__AssemblyContext();
-						if (repositoryComponentInstance.getEntityName().equals(
-								componentName)) {
-							// 3) setRequiringAssemblyContext assemblyContext to
-							// assemblyConnector
-							assemblyConnector
-									.setRequiringAssemblyContext_AssemblyConnector(assemblyContext);
-						}
-						final EList<ProvidedRole> providedRoles = repositoryComponentInstance
-								.getProvidedRoles_InterfaceProvidingEntity();
-						if (providedRoles.size() <= 1) {
-							for (final ProvidedRole providedRole : providedRoles) {
-								final OperationProvidedRole operationProvidedRoleInstance = (OperationProvidedRole) providedRole;
-								if (operationRequiredRole
-										.getRequiredInterface__OperationRequiredRole()
-										.getId()
-										.equals(operationProvidedRoleInstance
-												.getProvidedInterface__OperationProvidedRole()
-												.getId())) {
+								final EList<AssemblyContext> assemblyContexts = system
+										.getAssemblyContexts__ComposedStructure();
+								for (final AssemblyContext assemblyContext : assemblyContexts) {
 
-									// 4) setProvidingAssemblyContext to
-									// assemblyConnector
-									assemblyConnector
-											.setProvidingAssemblyContext_AssemblyConnector(assemblyContext);
+									String assemblyName = assemblyContext
+											.getEncapsulatedComponent__AssemblyContext()
+											.getEntityName();
+
+									if (assemblyName.equals(componentName)) {
+										// 3) setRequiringAssemblyContext
+										// assemblyContext to
+										// assemblyConnector
+										assemblyConnector
+												.setRequiringAssemblyContext_AssemblyConnector(assemblyContext);
+
+									} else if (assemblyName
+											.equals(opr
+													.getProvidedInterface__OperationProvidedRole()
+													.getEntityName())) {
+
+										// 4)
+										// setProvidingAssemblyContext
+										// to
+										// assemblyConnector
+										assemblyConnector
+												.setProvidingAssemblyContext_AssemblyConnector(assemblyContext);
+
+									}
 								}
 							}
 						}
 					}
 
 					// 5 add EntityName
-					assemblyConnector.setEntityName("AssemblyConnector");
+					assemblyConnector.setEntityName("AssemblyConnector"
+							+ componentName);
 					system.getConnectors__ComposedStructure().add(
 							assemblyConnector);
 				}
 			}
 		}
 	}
-
 }

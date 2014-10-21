@@ -16,15 +16,12 @@ import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configurati
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
-import de.uka.ipd.sdq.pcm.repository.Interface;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
-import de.uka.ipd.sdq.pcm.repository.OperationRequiredRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
 import de.uka.ipd.sdq.pcm.repository.Repository;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
 import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
-import de.uka.ipd.sdq.pcm.repository.RequiredRole;
 import de.uka.ipd.sdq.pcm.seff.ResourceDemandingSEFF;
 import de.uka.ipd.sdq.pcm.seff.SeffFactory;
 
@@ -140,8 +137,8 @@ public class RepositoryCreator extends CreatorTools {
 		// setRequiredRoles to all other components
 		// TODO: Set required roles only the really required components, not to
 		// all
-		createRequiredRoleBetweenComponents(bc.getEntityName(), null,
-				repository);
+		// createRequiredRoleBetweenComponents(bc.getEntityName(), null,
+		// repository);
 
 		// create a operationSignature for each markovState having outgoing
 		// transitions in the behaviorModel
@@ -216,71 +213,6 @@ public class RepositoryCreator extends CreatorTools {
 		seff.setDescribedService__SEFF(operationSignature);
 		seffCreator
 				.createSeff(seff, thisResourceSet, repository, behaviorModel);
-	}
-
-	/**
-	 * 
-	 * Set required role to all required interfaces. When toComponent is set to
-	 * null then the required role will be set to all existing interfaces.
-	 * 
-	 * @param componentName
-	 * @param toComponent
-	 * @param repository
-	 */
-	private void createRequiredRoleBetweenComponents(
-			final String componentName, final String toComponent,
-			final Repository repository) {
-
-		final EList<RepositoryComponent> rc = repository
-				.getComponents__Repository();
-		final EList<Interface> interfaces = repository
-				.getInterfaces__Repository();
-
-		// set required role to other services
-		for (final RepositoryComponent repositoryComponent : rc) {
-			if (repositoryComponent.getEntityName().equals(componentName)) {
-				for (final Interface interfaceInstance : interfaces) {
-
-					// when toComponent null ist dann wird eine verbindung zu
-					// alles interfaces hergestellt,
-					// wenn toComponent einen Wert hat dann nur zu diesem
-					// Interface
-					if (toComponent == null
-							|| interfaceInstance.getEntityName().equals(
-									toComponent)
-							|| interfaceInstance.getEntityName().equals(
-									componentName)) {
-
-						final EList<RequiredRole> requiredRoles = repositoryComponent
-								.getRequiredRoles_InterfaceRequiringEntity();
-
-						// check if role already exists
-						boolean requiredRoleExits = false;
-						for (final RequiredRole requiredRole : requiredRoles) {
-							if (requiredRole.getEntityName().equals(
-									interfaceInstance.getEntityName())) {
-								requiredRoleExits = true;
-								break;
-							}
-						}
-
-						if (!requiredRoleExits) {
-							// create required Role
-							final OperationRequiredRole opReqRole = RepositoryFactory.eINSTANCE
-									.createOperationRequiredRole();
-							opReqRole.setEntityName(interfaceInstance
-									.getEntityName());
-							repositoryComponent
-									.getRequiredRoles_InterfaceRequiringEntity()
-									.add(opReqRole);
-							final OperationInterface oi = (OperationInterface) interfaceInstance;
-							opReqRole
-									.setRequiredInterface__OperationRequiredRole(oi);
-						}
-					}
-				}
-			}
-		}
 	}
 
 }

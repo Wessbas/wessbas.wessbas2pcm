@@ -14,10 +14,13 @@ import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.Creato
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
+import de.uka.ipd.sdq.pcm.repository.Interface;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationRequiredRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
 import de.uka.ipd.sdq.pcm.repository.Repository;
+import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
+import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
 import de.uka.ipd.sdq.pcm.repository.RequiredRole;
 import de.uka.ipd.sdq.pcm.resourcetype.ProcessingResourceType;
 import de.uka.ipd.sdq.pcm.resourcetype.ResourceRepository;
@@ -41,6 +44,7 @@ import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
 public class SeffCreator extends CreatorTools {
 
 	private ResourceSet thisResourceSet;
+	private Repository thisRepository;
 
 	/**
 	 * Create seff for the markovState of the behaviorModel.
@@ -59,6 +63,7 @@ public class SeffCreator extends CreatorTools {
 
 		try {
 			thisResourceSet = resourceSet;
+			thisRepository = repository;
 
 			// create start, stop and branchAction
 			StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
@@ -154,9 +159,10 @@ public class SeffCreator extends CreatorTools {
 		resourceDemandingBehaviour.getSteps_Behaviour().add(internalAction);
 
 		// add externalCall to the system
+		// TODO: Create better solution for target component
 		ExternalCallAction externalCallAction = createExternalCallAction(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
-						.getTargetState().getEId());
+						.getTargetState().getEId(), "_app");
 
 		if (externalCallAction != null) {
 			resourceDemandingBehaviour.getSteps_Behaviour().add(
@@ -258,56 +264,24 @@ public class SeffCreator extends CreatorTools {
 	 * @return ExternalCallAction
 	 */
 	private ExternalCallAction createExternalCallAction(
-			final BasicComponent bc, final String operationName) {
-		ExternalCallAction externalAction = null;
-		// find the required role of external call and create external call
-		final EList<RequiredRole> requiredRoles = bc
-				.getRequiredRoles_InterfaceRequiringEntity();
-		for (final RequiredRole requiredRole : requiredRoles) {
-			final OperationRequiredRole opreq = (OperationRequiredRole) requiredRole;
-			final OperationInterface oi = opreq
-					.getRequiredInterface__OperationRequiredRole();
-			if (operationName.contains(oi.getEntityName())) {
-				final EList<OperationSignature> operationSignatures = oi
-						.getSignatures__OperationInterface();
-				for (final OperationSignature operationSignature : operationSignatures) {
-					externalAction = SeffFactory.eINSTANCE
-							.createExternalCallAction();
-					externalAction.setEntityName(operationName);
-					externalAction
-							.setCalledService_ExternalService(operationSignature);
-					externalAction.setRole_ExternalService(opreq);
-				}
-			}
-		}
-		return externalAction;
-	}
-
-	/**
-	 * Create a externalCallAction of a specific component.
-	 * 
-	 * @param bc
-	 * @param operationName
-	 * @param componentName
-	 * @return
-	 */
-	private ExternalCallAction createExternalCallAction(
 			final BasicComponent bc, final String operationName,
 			final String componentName) {
 		ExternalCallAction externalAction = null;
-		// find the required role of external call and create external call
-		final EList<RequiredRole> requiredRoles = bc
-				.getRequiredRoles_InterfaceRequiringEntity();
-		for (final RequiredRole requiredRole : requiredRoles) {
-			final OperationRequiredRole opreq = (OperationRequiredRole) requiredRole;
-			final OperationInterface oi = opreq
-					.getRequiredInterface__OperationRequiredRole();
-			if (oi.getEntityName().equals(componentName)) {
-				final EList<OperationSignature> operationSignatures = oi
+		EList<Interface> interfaceList = thisRepository
+				.getInterfaces__Repository();
+		for (Interface interfaceInstance : interfaceList) {
+			// TODO: remove and a general solution.
+			if (interfaceInstance.getEntityName().equals(componentName)) {
+				OperationInterface oi = (OperationInterface) interfaceInstance;
+				EList<OperationSignature> operationSignatureList = oi
 						.getSignatures__OperationInterface();
-				for (final OperationSignature operationSignature : operationSignatures) {
+				for (OperationSignature operationSignature : operationSignatureList) {
 					if (operationName.contains(operationSignature
 							.getEntityName())) {
+						OperationRequiredRole opreq = createRequiredRoleBetweenComponents(
+								bc.getEntityName(),
+								interfaceInstance.getEntityName(),
+								thisRepository);
 						externalAction = SeffFactory.eINSTANCE
 								.createExternalCallAction();
 						externalAction.setEntityName(operationName);
@@ -318,7 +292,78 @@ public class SeffCreator extends CreatorTools {
 				}
 			}
 		}
+
 		return externalAction;
+	}
+
+	/**
+	 * 
+	 * Set required role to all required interfaces. When toComponent is set to
+	 * null then the required role will be set to all existing interfaces.
+	 * 
+	 * @param componentName
+	 * 
+	 * @param toInterface
+	 * 
+	 * @param repository
+	 */
+	private OperationRequiredRole createRequiredRoleBetweenComponents(
+			final String fromComponent, final String toInterface,
+			final Repository repository) {
+
+		OperationRequiredRole opReqRole = null;
+
+		final EList<RepositoryComponent> rc = repository
+				.getComponents__Repository();
+		final EList<Interface> interfaces = repository
+				.getInterfaces__Repository();
+
+		// set required role to other services
+		for (final RepositoryComponent repositoryComponent : rc) {
+			if (repositoryComponent.getEntityName().equals(fromComponent)) {
+				for (final Interface interfaceInstance : interfaces) {
+
+					// when toComponent null ist dann wird eine verbindung zu
+					// alles interfaces hergestellt,
+					// wenn toInterface einen Wert hat dann nur zu diesem
+					// Interface
+					if (toInterface == null
+							|| interfaceInstance.getEntityName().equals(
+									toInterface)) {
+
+						final EList<RequiredRole> requiredRoles = repositoryComponent
+								.getRequiredRoles_InterfaceRequiringEntity();
+
+						// check if role already exists
+						boolean requiredRoleExits = false;
+						for (final RequiredRole requiredRole : requiredRoles) {
+							if (requiredRole.getEntityName().equals(
+									interfaceInstance.getEntityName())) {
+								requiredRoleExits = true;
+								opReqRole = (OperationRequiredRole) requiredRole;
+								break;
+							}
+						}
+
+						if (!requiredRoleExits) {
+							// create required Role
+							opReqRole = RepositoryFactory.eINSTANCE
+									.createOperationRequiredRole();
+							opReqRole.setEntityName(interfaceInstance
+									.getEntityName());
+							repositoryComponent
+									.getRequiredRoles_InterfaceRequiringEntity()
+									.add(opReqRole);
+							final OperationInterface oi = (OperationInterface) interfaceInstance;
+							opReqRole
+									.setRequiredInterface__OperationRequiredRole(oi);
+						}
+					}
+				}
+			}
+		}
+
+		return opReqRole;
 	}
 
 }

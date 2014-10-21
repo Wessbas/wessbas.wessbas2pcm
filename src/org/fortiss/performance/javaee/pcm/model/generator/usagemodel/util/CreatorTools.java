@@ -79,12 +79,19 @@ public abstract class CreatorTools {
 		return system;
 	}
 
+	// /**
+	// * @param componentName
+	// * @return String
+	// */
+	// public final String getAssemblyName(String componentName) {
+	// return "Assembly_" + componentName + " <" + componentName + ">";
+	// }
+
 	/**
 	 * @param componentName
 	 * @return String
 	 */
 	public final String getAssemblyName(String componentName) {
-		return "Assembly_" + componentName + " <" + componentName + ">";
+		return componentName;
 	}
-
 }

@@ -1,7 +1,7 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration;
 
 public class Constants {
-	public static final String MODEL_DIRECTORY = "../eclipse-jee-juno-SR2-win32-x86_64_2/eclipse/workspace/specjPM";
+	public static final String MODEL_DIRECTORY = "./workspace/specjPM";
 	public static final String USAGE_MODEL_NAME = "test.usagemodel";
 	public static final String REPOSITORY_MODEL_NAME = "test.repository";
 	public static final String ALLOCATION_MODEL_NAME = "test.allocation";
@@ -12,5 +12,5 @@ public class Constants {
 	public static final String INPUT_FILE_DELIMITER_PARAMETERPAIR = "/";
 	public static final String INPUT_FILE_DELIMITER_PARAMETER = "=";
 	public static final String BEHAVIORMODELCONTAINER = "aName";
-	public static final String XMI_FILE = "file:///../workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/input/workloadmodel.xmi";
+	public static final String XMI_FILE = "./workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/input/workloadmodel.xmi";
 }
