@@ -3,14 +3,16 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 import java.io.IOException;
 import java.util.Collections;
 
+import m4jdsl.BehaviorModel;
+import m4jdsl.MarkovState;
+import m4jdsl.WorkloadModel;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.Transition;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
@@ -27,36 +29,39 @@ import de.uka.ipd.sdq.pcm.seff.ResourceDemandingSEFF;
 import de.uka.ipd.sdq.pcm.seff.SeffFactory;
 
 /**
- * This class creates the PCM Repository
+ * This class creates new basic components into the existing PCM Repository
+ * Model.
+ * 
+ * @author voegele
+ * 
  */
 public class RepositoryCreator extends CreatorTools {
 
 	private ResourceSet thisResourceSet;
 	private Repository repository;
 	private SeffCreator seffCreator = new SeffCreator();
-	private Transition[][] thisTransitionMatrix;
 
 	/**
 	 * 
 	 * creates PCM Repository Model.
 	 * 
 	 * @param resourceSet
-	 * @param navigationRules
+	 * @param workloadModel
 	 */
 	public final void createWorkflowComponent(final ResourceSet resourceSet,
-			Transition[][] transitionMatrix) {
+			WorkloadModel workloadModel) {
 
 		thisResourceSet = resourceSet;
-		thisTransitionMatrix = transitionMatrix;
 		Resource repositoryResource = null;
 		EObject rootTarget;
 
 		try {
 
-			log.info("- UPDATE WORKFLOW COMPONENT");
+			log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
 
 			// check if repository exists, if yes load it
 			if (Configuration.getRepositoryFile().exists()) {
+
 				// load TargetResource
 				repositoryResource = thisResourceSet.getResource(URI
 						.createFileURI(Configuration.getRepositoryFile()
@@ -65,11 +70,17 @@ public class RepositoryCreator extends CreatorTools {
 				rootTarget = repositoryResource.getContents().get(0);
 				repository = (Repository) rootTarget;
 
-				createNewComponent();
+				// get behaviorModels of the workloadModel
+				EList<BehaviorModel> behaviorModelList = workloadModel
+						.getBehaviorModels();
+
+				// create a new component per behaviorModel
+				for (BehaviorModel behaviorModel : behaviorModelList) {
+					createBehaviorModelComponent(behaviorModel);
+				}
 
 				// save
 				repositoryResource.save(null);
-
 			}
 
 		} catch (IOException e) {
@@ -79,13 +90,13 @@ public class RepositoryCreator extends CreatorTools {
 
 	/**
 	 * 
-	 * create new component.
+	 * Create new behaviorModel component.
 	 * 
 	 * @param componentName
 	 * @param OperationSignature
 	 * @param navigationRules
 	 */
-	private void createNewComponent() {
+	private void createBehaviorModelComponent(BehaviorModel behaviorModel) {
 		BasicComponent bc = null;
 		OperationInterface myInterface = null;
 
@@ -93,23 +104,24 @@ public class RepositoryCreator extends CreatorTools {
 		EList<RepositoryComponent> rc = repository.getComponents__Repository();
 		for (RepositoryComponent repositoryComponent : rc) {
 			if (repositoryComponent.getEntityName().equals(
-					Constants.WORKFLOWCOMPONENT)) {
+					behaviorModel.getName())) {
 				bc = (BasicComponent) repositoryComponent;
 				break;
 			}
 		}
 
+		// if component does not exist
 		if (bc == null) {
 
 			// create basicComponent
 			bc = RepositoryFactory.eINSTANCE.createBasicComponent();
-			bc.setEntityName(Constants.WORKFLOWCOMPONENT);
+			bc.setEntityName(behaviorModel.getName());
 			repository.getComponents__Repository().add(bc);
 
 			// add interface
 			myInterface = RepositoryFactory.eINSTANCE
 					.createOperationInterface();
-			myInterface.setEntityName(Constants.WORKFLOWCOMPONENT);
+			myInterface.setEntityName(behaviorModel.getName());
 			repository.getInterfaces__Repository().add(myInterface);
 
 			// provided role
@@ -126,28 +138,36 @@ public class RepositoryCreator extends CreatorTools {
 		}
 
 		// setRequiredRoles to all other components
+		// TODO: Set required roles only the really required components, not to
+		// all
 		createRequiredRoleBetweenComponents(bc.getEntityName(), null,
 				repository);
 
-		// create a operationSignature for each URL
-		for (int i = 0; i < thisTransitionMatrix.length; i++) {
-			createOperationSignature(
-					thisTransitionMatrix[i][0].getFromRequestURL(), myInterface);
+		// create a operationSignature for each markovState having outgoing
+		// transitions in the behaviorModel
+		for (MarkovState markovState : behaviorModel.getMarkovStates()) {
+			if (markovState.getOutgoingTransitions().size() > 0) {
+				createOperationSignature(markovState.getService().getName(),
+						myInterface);
+			}
 		}
 
-		// initSeffs for the new operationSignatures of workflowcomponent
+		// create a new seff for the new operationSignature of the
+		// behaviorModelComponent
 		EList<OperationSignature> operationSignatures = myInterface
 				.getSignatures__OperationInterface();
 		for (OperationSignature operationSignature : operationSignatures) {
-			seffInitializer(operationSignature, bc);
+			seffInitializer(operationSignature, bc, behaviorModel);
 		}
 
 	}
 
 	/**
+	 * Create a operationSignature.
+	 * 
 	 * @param signatureName
 	 * @param interfaceInstance
-	 * @return
+	 * @return OperationSignature
 	 */
 	private OperationSignature createOperationSignature(
 			final String signatureName,
@@ -155,15 +175,12 @@ public class RepositoryCreator extends CreatorTools {
 
 		OperationSignature operationSignature = null;
 
-		// adjust signatureName
-		String signatureNameNew = replaceNotAllowedCharacters(signatureName);
-
 		// check if operationSignature already exists
 		EList<OperationSignature> operationSignatures = interfaceInstance
 				.getSignatures__OperationInterface();
 		boolean operationSignatureExists = false;
 		for (OperationSignature os : operationSignatures) {
-			if (os.getEntityName().equals(signatureNameNew)) {
+			if (os.getEntityName().equals(signatureName)) {
 				operationSignatureExists = true;
 				break;
 			}
@@ -174,7 +191,7 @@ public class RepositoryCreator extends CreatorTools {
 			// create signature names
 			operationSignature = RepositoryFactory.eINSTANCE
 					.createOperationSignature();
-			operationSignature.setEntityName(signatureNameNew);
+			operationSignature.setEntityName(signatureName);
 			interfaceInstance.getSignatures__OperationInterface().add(
 					operationSignature);
 
@@ -183,24 +200,27 @@ public class RepositoryCreator extends CreatorTools {
 	}
 
 	/**
+	 * Create a new seff in the basic component and pass it to the seff creator
+	 * to initialize it.
+	 * 
 	 * @param operationSignature
 	 * @param bc
 	 * @param resourceDemand
 	 */
 	private void seffInitializer(final OperationSignature operationSignature,
-			final BasicComponent bc) {
+			final BasicComponent bc, BehaviorModel behaviorModel) {
 		// create SEFF
 		ResourceDemandingSEFF seff = SeffFactory.eINSTANCE
 				.createResourceDemandingSEFF();
 		seff.setBasicComponent_ServiceEffectSpecification(bc);
 		seff.setDescribedService__SEFF(operationSignature);
-		seffCreator.createSeff(seff, thisResourceSet, repository,
-				thisTransitionMatrix);
+		seffCreator
+				.createSeff(seff, thisResourceSet, repository, behaviorModel);
 	}
 
 	/**
 	 * 
-	 * set required role to all required interfaces. When toComponent is set to
+	 * Set required role to all required interfaces. When toComponent is set to
 	 * null then the required role will be set to all existing interfaces.
 	 * 
 	 * @param componentName
@@ -234,7 +254,7 @@ public class RepositoryCreator extends CreatorTools {
 						final EList<RequiredRole> requiredRoles = repositoryComponent
 								.getRequiredRoles_InterfaceRequiringEntity();
 
-						// check if role already existst
+						// check if role already exists
 						boolean requiredRoleExits = false;
 						for (final RequiredRole requiredRole : requiredRoles) {
 							if (requiredRole.getEntityName().equals(

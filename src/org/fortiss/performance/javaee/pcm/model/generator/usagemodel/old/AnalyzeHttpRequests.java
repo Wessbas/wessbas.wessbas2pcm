@@ -1,13 +1,11 @@
 /**
  * 
  */
-package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.analyser;
+package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.old;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.HttpRequestInstance;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.Transition;
 
 /**
  * @author voegele

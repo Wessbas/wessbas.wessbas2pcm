@@ -2,10 +2,13 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
 
+import m4jdsl.BehaviorModel;
+import m4jdsl.MarkovState;
+import m4jdsl.NormallyDistributedThinkTime;
+import m4jdsl.Transition;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.Transition;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
@@ -38,32 +41,33 @@ import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
 public class SeffCreator extends CreatorTools {
 
 	private ResourceSet thisResourceSet;
-	private Transition[][] thisTransitionMatrix;
 
 	/**
-	 * create Seff method.
+	 * Create seff for the markovState of the behaviorModel.
 	 * 
 	 * @param seff
 	 * @param resourceSet
 	 * @param repository
-	 * @param transitionMatrix
+	 * @param behaviorModel
 	 */
 	public final void createSeff(final ResourceDemandingSEFF seff,
 			final ResourceSet resourceSet, final Repository repository,
-			final Transition[][] transitionMatrix) {
+			final BehaviorModel behaviorModel) {
 
-		log.info("- CREATE WORKFLOW SEFF: "
+		log.info("- CREATE BEHAVIORMODEL SEFF: "
 				+ seff.getDescribedService__SEFF().getEntityName());
 
 		try {
 			thisResourceSet = resourceSet;
-			thisTransitionMatrix = transitionMatrix;
+
+			// create start, stop and branchAction
 			StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
 			seff.getSteps_Behaviour().add(startAction);
 			StopAction stopAction = SeffFactory.eINSTANCE.createStopAction();
 			seff.getSteps_Behaviour().add(stopAction);
-			BranchAction branchAction = createBranch(seff);
+			BranchAction branchAction = createBranch(seff, behaviorModel);
 
+			// connect new nodes
 			if (branchAction != null) {
 				seff.getSteps_Behaviour().add(branchAction);
 				startAction.setSuccessor_AbstractAction(branchAction);
@@ -81,38 +85,50 @@ public class SeffCreator extends CreatorTools {
 
 	}
 
-	private BranchAction createBranch(final ResourceDemandingSEFF seff)
-			throws IOException {
+	/**
+	 * Create a new branchAction in the seff.
+	 * 
+	 * @param seff
+	 * @param behaviorModel
+	 * @return BranchAction
+	 * @throws IOException
+	 */
+	private BranchAction createBranch(final ResourceDemandingSEFF seff,
+			final BehaviorModel behaviorModel) throws IOException {
 		BranchAction branchAction = SeffFactory.eINSTANCE.createBranchAction();
-		String compareNameOfSeff = null;
-		int nbrOfTransitions = 0;
-		for (int i = 0; i < thisTransitionMatrix.length; i++) {
-			compareNameOfSeff = replaceNotAllowedCharacters(thisTransitionMatrix[i][0]
-					.getFromRequestURL());
-			if (compareNameOfSeff.equals(seff.getDescribedService__SEFF()
-					.getEntityName())) {
-				for (int s = 0; s < thisTransitionMatrix[i].length; s++) {
-					if (thisTransitionMatrix[i][s].getProbability() > 0) {
-						ProbabilisticBranchTransition probabilisticBranchTransition = createProbabilisticBranchTransition(
-								thisTransitionMatrix[i][s], seff);
-						probabilisticBranchTransition
-								.setBranchAction_AbstractBranchTransition(branchAction);
-						nbrOfTransitions++;
-					}
+		for (MarkovState markovState : behaviorModel.getMarkovStates()) {
+
+			// identify markovState with seff name
+			if (markovState.getService().getName()
+					.equals(seff.getDescribedService__SEFF().getEntityName())) {
+
+				// for each toutgoing transition of the markovState, create a
+				// new probabilisticBranchTransition
+				for (Transition transition : markovState
+						.getOutgoingTransitions()) {
+					ProbabilisticBranchTransition probabilisticBranchTransition = createProbabilisticBranchTransition(
+							transition, seff, behaviorModel);
+					probabilisticBranchTransition
+							.setBranchAction_AbstractBranchTransition(branchAction);
 				}
 			}
 		}
-
-		if (nbrOfTransitions > 0) {
-			return branchAction;
-		} else {
-			return null;
-		}
+		return branchAction;
 	}
 
+	/**
+	 * Create a new probabilisticBranchTransition for each outgoing transition
+	 * of the markovState.
+	 * 
+	 * @param transition
+	 * @param seff
+	 * @param behaviorModel
+	 * @return ProbabilisticBranchTransition
+	 * @throws IOException
+	 */
 	private ProbabilisticBranchTransition createProbabilisticBranchTransition(
-			Transition transition, final ResourceDemandingSEFF seff)
-			throws IOException {
+			Transition transition, final ResourceDemandingSEFF seff,
+			BehaviorModel behaviorModel) throws IOException {
 		ProbabilisticBranchTransition probabilisticBranchTransition = SeffFactory.eINSTANCE
 				.createProbabilisticBranchTransition();
 		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
@@ -123,48 +139,63 @@ public class SeffCreator extends CreatorTools {
 		resourceDemandingBehaviour.getSteps_Behaviour().add(startAction);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
 
-		// add delay
+		// add thinkTime of transition as internal action with delay
 		InternalAction internalAction = SeffFactory.eINSTANCE
 				.createInternalAction();
+
+		final NormallyDistributedThinkTime normallyDistributedThinkTime = (NormallyDistributedThinkTime) transition
+				.getThinkTime();
+
 		internalAction.getResourceDemand_Action().add(
 				getParametricResourceDemand(thisResourceSet, "DELAY",
-						transition.getAverageThinkTime()));
+						normallyDistributedThinkTime.getMean(),
+						normallyDistributedThinkTime.getDeviation()));
+
 		resourceDemandingBehaviour.getSteps_Behaviour().add(internalAction);
 
-		String toRequestURL = replaceNotAllowedCharacters(transition
-				.getToRequestURL());
-
-		// add externalCall
+		// add externalCall to the system
 		ExternalCallAction externalCallAction = createExternalCallAction(
-				seff.getBasicComponent_ServiceEffectSpecification(),
-				toRequestURL);
+				seff.getBasicComponent_ServiceEffectSpecification(), transition
+						.getTargetState().getEId());
 
 		if (externalCallAction != null) {
 			resourceDemandingBehaviour.getSteps_Behaviour().add(
 					externalCallAction);
 		}
 
-		// add next URL
-		ExternalCallAction nextUserStep = createExternalCallAction(
-				seff.getBasicComponent_ServiceEffectSpecification(),
-				toRequestURL, Constants.WORKFLOWCOMPONENT);
-		resourceDemandingBehaviour.getSteps_Behaviour().add(nextUserStep);
+		// add next markov state, outgoingTransition
+		ExternalCallAction targetState = createExternalCallAction(
+				seff.getBasicComponent_ServiceEffectSpecification(), transition
+						.getTargetState().getEId(), behaviorModel.getName());
 
-		// knoten verknüpfen
+		if (targetState != null) {
+			resourceDemandingBehaviour.getSteps_Behaviour().add(targetState);
+		}
+
+		// connect new nodes
 		startAction.setSuccessor_AbstractAction(internalAction);
 		internalAction.setPredecessor_AbstractAction(startAction);
 
-		if (externalCallAction != null) {
+		if (externalCallAction != null && targetState != null) {
 			internalAction.setSuccessor_AbstractAction(externalCallAction);
 			externalCallAction.setPredecessor_AbstractAction(internalAction);
-			externalCallAction.setSuccessor_AbstractAction(nextUserStep);
-			nextUserStep.setPredecessor_AbstractAction(externalCallAction);
+			externalCallAction.setSuccessor_AbstractAction(targetState);
+			targetState.setPredecessor_AbstractAction(externalCallAction);
+			targetState.setSuccessor_AbstractAction(stopAction);
+			stopAction.setPredecessor_AbstractAction(targetState);
+		} else if (externalCallAction == null && targetState != null) {
+			internalAction.setSuccessor_AbstractAction(targetState);
+			targetState.setPredecessor_AbstractAction(internalAction);
+			targetState.setSuccessor_AbstractAction(stopAction);
+			stopAction.setPredecessor_AbstractAction(targetState);
+		} else if (externalCallAction != null && targetState == null) {
+			internalAction.setSuccessor_AbstractAction(externalCallAction);
+			externalCallAction.setPredecessor_AbstractAction(internalAction);
+			externalCallAction.setSuccessor_AbstractAction(stopAction);
+			stopAction.setPredecessor_AbstractAction(externalCallAction);
 		} else {
-			internalAction.setSuccessor_AbstractAction(nextUserStep);
+			internalAction.setSuccessor_AbstractAction(stopAction);
 		}
-
-		nextUserStep.setSuccessor_AbstractAction(stopAction);
-		stopAction.setPredecessor_AbstractAction(nextUserStep);
 
 		probabilisticBranchTransition
 				.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);
@@ -177,12 +208,14 @@ public class SeffCreator extends CreatorTools {
 	 * @param resourceSet
 	 * @param resourceDemandType
 	 * @param resourceDemand
+	 * @param deviation
 	 * @return ParametricResourceDemand
 	 * @throws IOException
 	 */
 	private ParametricResourceDemand getParametricResourceDemand(
 			final ResourceSet resourceSet, final String resourceDemandType,
-			final double resourceDemand) throws IOException {
+			final double resourceDemand, final double deviation)
+			throws IOException {
 		final ParametricResourceDemand parametricResourceDemand = SeffPerformanceFactory.eINSTANCE
 				.createParametricResourceDemand();
 
@@ -200,8 +233,15 @@ public class SeffCreator extends CreatorTools {
 						resourceDemandType)) {
 					parametricResourceDemand
 							.setRequiredResource_ParametricResourceDemand(processingResourceType);
-					pcmRandomVariable.setSpecification(new Double(
-							resourceDemand).toString());
+
+					// if deviation is zero just set the mean resource demand
+					if (deviation == 0) {
+						pcmRandomVariable.setSpecification(Double
+								.toString(resourceDemand));
+					} else {
+						pcmRandomVariable.setSpecification("Norm ("
+								+ resourceDemand + "," + deviation + ")");
+					}
 				}
 			}
 		}
@@ -211,6 +251,8 @@ public class SeffCreator extends CreatorTools {
 	}
 
 	/**
+	 * Create externalCallAction to the system.
+	 * 
 	 * @param bc
 	 * @param operationName
 	 * @return ExternalCallAction
@@ -242,13 +284,16 @@ public class SeffCreator extends CreatorTools {
 	}
 
 	/**
+	 * Create a externalCallAction of a specific component.
+	 * 
 	 * @param bc
 	 * @param operationName
-	 * @return ExternalCallAction
+	 * @param componentName
+	 * @return
 	 */
 	private ExternalCallAction createExternalCallAction(
 			final BasicComponent bc, final String operationName,
-			final String parentName) {
+			final String componentName) {
 		ExternalCallAction externalAction = null;
 		// find the required role of external call and create external call
 		final EList<RequiredRole> requiredRoles = bc
@@ -257,7 +302,7 @@ public class SeffCreator extends CreatorTools {
 			final OperationRequiredRole opreq = (OperationRequiredRole) requiredRole;
 			final OperationInterface oi = opreq
 					.getRequiredInterface__OperationRequiredRole();
-			if (oi.getEntityName().equals(parentName)) {
+			if (oi.getEntityName().equals(componentName)) {
 				final EList<OperationSignature> operationSignatures = oi
 						.getSignatures__OperationInterface();
 				for (final OperationSignature operationSignature : operationSignatures) {

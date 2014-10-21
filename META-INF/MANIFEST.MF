@@ -13,3 +13,7 @@ Require-Bundle: org.eclipse.ui,
  de.uka.ipd.sdq.pcm;bundle-version="3.2.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Import-Package: de.uka.ipd.sdq.simucomframework.usage,
+ m4jdsl,
+ m4jdsl.impl,
+ net.sf.markov4jmeter.behavior

@@ -3,6 +3,9 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 import java.io.IOException;
 import java.util.Collections;
 
+import m4jdsl.BehaviorModel;
+import m4jdsl.WorkloadModel;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -27,16 +30,17 @@ public class AllocationCreator extends CreatorTools {
 
 	/**
 	 * @param resourceSet
+	 * @param workloadModel
 	 * @throws IOException
 	 */
-	public final void updateAllocation(final ResourceSet resourceSet)
-			throws IOException {
+	public final void updateAllocation(final ResourceSet resourceSet,
+			WorkloadModel workloadModel) throws IOException {
 
 		Resource allocationResource = null;
 		Allocation allocation = null;
 		EObject rootTarget;
 
-		log.info("- UPDATE ALLOCATION");
+		log.info("- UPDATE ALLOCATION MODEL");
 
 		// check if Allocation exists, if yes load it
 		if (Configuration.getAllocationFile().exists()) {
@@ -71,10 +75,16 @@ public class AllocationCreator extends CreatorTools {
 			allocation
 					.setTargetResourceEnvironment_Allocation(resourceEnvironment);
 
-			// allocate testcase component to workflowcontainer
-			createAllocationContext(system, allocation, resourceEnvironment,
-					Configuration.WORKFLOWCOMPONENTASSEMBLY,
-					Configuration.WORKFLOWCOMPONENTCONTAINER);
+			// allocate components to behaviorModelContainer
+			EList<BehaviorModel> behaviorModelList = workloadModel
+					.getBehaviorModels();
+
+			for (BehaviorModel behaviorModel : behaviorModelList) {
+				createAllocationContext(system, allocation,
+						resourceEnvironment,
+						getAssemblyName(behaviorModel.getName()),
+						Configuration.BEHAVIORMODELCONTAINER);
+			}
 
 			// save
 			allocationResource.save(null);
@@ -83,6 +93,8 @@ public class AllocationCreator extends CreatorTools {
 	}
 
 	/**
+	 * Create new allocationContext.
+	 * 
 	 * @param system
 	 * @param allocation
 	 * @param resourceEnvironment

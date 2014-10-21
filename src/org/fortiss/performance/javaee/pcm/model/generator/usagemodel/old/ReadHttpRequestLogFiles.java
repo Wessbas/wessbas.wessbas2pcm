@@ -1,4 +1,4 @@
-package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.files;
+package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.old;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.HttpRequestInstance;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 
 public class ReadHttpRequestLogFiles {

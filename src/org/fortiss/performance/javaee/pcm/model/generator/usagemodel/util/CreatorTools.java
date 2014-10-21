@@ -9,7 +9,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 
 import de.uka.ipd.sdq.pcm.resourcetype.ResourceRepository;
 import de.uka.ipd.sdq.pcm.system.System;
@@ -80,18 +79,12 @@ public abstract class CreatorTools {
 		return system;
 	}
 
-	public static String replaceNotAllowedCharacters(String value) {
-		// "/" and ":" is not allowed in method Names
-		if (value != null) {
-			value = value.replace(":", Constants.REPLACEMENT_STRING);
-			value = value.replace("/", Constants.REPLACEMENT_STRING);
-			value = value.replace("#", Constants.REPLACEMENT_STRING);
-			value = value.replace("{", Constants.REPLACEMENT_STRING);
-			value = value.replace("}", Constants.REPLACEMENT_STRING);
-			value = value.replace(".", Constants.REPLACEMENT_STRING);
-			value = value.replace(" ", Constants.REPLACEMENT_STRING);
-		}
-		return value;
+	/**
+	 * @param componentName
+	 * @return String
+	 */
+	public final String getAssemblyName(String componentName) {
+		return "Assembly_" + componentName + " <" + componentName + ">";
 	}
 
 }

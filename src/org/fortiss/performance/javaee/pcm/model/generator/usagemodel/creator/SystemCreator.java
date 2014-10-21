@@ -3,6 +3,9 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 import java.io.IOException;
 import java.util.Collections;
 
+import m4jdsl.BehaviorModel;
+import m4jdsl.WorkloadModel;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -26,12 +29,20 @@ import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
 import de.uka.ipd.sdq.pcm.repository.RequiredRole;
 import de.uka.ipd.sdq.pcm.system.System;
 
+/**
+ * This class updates the system model. For each newly created behaviorComponent
+ * in the repository, create a new Assembly.
+ * 
+ * @author voegele
+ * 
+ */
 public class SystemCreator extends CreatorTools {
 
 	/**
 	 * updates System Model.
 	 */
-	public final void updateSystem(final ResourceSet resourceSet) {
+	public final void updateSystem(final ResourceSet resourceSet,
+			WorkloadModel workloadModel) {
 
 		Resource systemResource = null;
 		Resource repositoryResource;
@@ -46,6 +57,7 @@ public class SystemCreator extends CreatorTools {
 
 			// load system
 			if (Configuration.getSystemFile().exists()) {
+
 				systemResource = resourceSet.getResource(URI
 						.createFileURI(Configuration.getSystemFile()
 								.getAbsolutePath()), true);
@@ -61,20 +73,26 @@ public class SystemCreator extends CreatorTools {
 				rootRepository = repositoryResource.getContents().get(0);
 				repository = (Repository) rootRepository;
 
-				// create new assembly for the testcase component
-				createAssemblyContext(system, repository,
-						Configuration.WORKFLOWCOMPONENT,
-						Configuration.WORKFLOWCOMPONENTASSEMBLY);
+				EList<BehaviorModel> behaviorModels = workloadModel
+						.getBehaviorModels();
 
-				// set connections between new component and the other
-				// assemblies
-				createAssemplyConnector(system, repository,
-						Configuration.WORKFLOWCOMPONENT);
+				// create a assembly for each behaviorModel
+				for (BehaviorModel behaviorModel : behaviorModels) {
+					// create new assembly
+					createAssemblyContext(system, repository,
+							behaviorModel.getName(),
+							getAssemblyName(behaviorModel.getName()));
 
-				// create new OperationProvidedRole and connect with new
-				// assembly
-				createOperationProvidedRole(system, repository,
-						Configuration.WORKFLOWCOMPONENT);
+					// set connections between the new assembly and the other
+					// assemblies
+					createAssemplyConnector(system, repository,
+							behaviorModel.getName());
+
+					// create new OperationProvidedRole and connect with new
+					// assembly
+					createOperationProvidedRole(system, repository,
+							behaviorModel.getName());
+				}
 
 				systemResource.save(null);
 
@@ -86,8 +104,12 @@ public class SystemCreator extends CreatorTools {
 	}
 
 	/**
+	 * 
+	 * Create new OperationProvidedRole.
+	 * 
 	 * @param system
 	 * @param repository
+	 * @param componentName
 	 */
 	public final void createOperationProvidedRole(final System system,
 			final Repository repository, final String componentName) {
@@ -136,7 +158,7 @@ public class SystemCreator extends CreatorTools {
 				.getAssemblyContexts__ComposedStructure();
 		for (final AssemblyContext assemblyContext : assemblyContexts) {
 			if (assemblyContext.getEntityName().equals(
-					Configuration.WORKFLOWCOMPONENTASSEMBLY)) {
+					getAssemblyName(componentName))) {
 				pdc.setAssemblyContext_ProvidedDelegationConnector(assemblyContext);
 			}
 		}
@@ -144,11 +166,12 @@ public class SystemCreator extends CreatorTools {
 	}
 
 	/**
-	 * Create new assembly with the specified name String assembly
+	 * Create new assembly with the specified name.
 	 * 
 	 * @param system
 	 * @param repository
-	 * @param assembly
+	 * @param assemblyName
+	 * @param assemblyContextName
 	 */
 	public final void createAssemblyContext(final System system,
 			final Repository repository, final String assemblyName,
@@ -168,25 +191,24 @@ public class SystemCreator extends CreatorTools {
 						assemblyContext);
 			}
 		}
-
 	}
 
 	/**
 	 * create new AssemplyConnector between the component and the required
-	 * assemplies
+	 * assemplies.
 	 * 
 	 * @param system
 	 * @param repository
-	 * @param component
+	 * @param componentName
 	 */
 	public final void createAssemplyConnector(final System system,
-			final Repository repository, final String component) {
+			final Repository repository, final String componentName) {
 
 		// set connections from required roles to provides roles
 		final EList<RepositoryComponent> componentRepositorys = repository
 				.getComponents__Repository();
 		for (final RepositoryComponent componentRepository : componentRepositorys) {
-			if (componentRepository.getEntityName().equals(component)) {
+			if (componentRepository.getEntityName().equals(componentName)) {
 				// get required roles of component
 				final EList<RequiredRole> requiredRoles = componentRepository
 						.getRequiredRoles_InterfaceRequiringEntity();
@@ -229,7 +251,7 @@ public class SystemCreator extends CreatorTools {
 						final RepositoryComponent repositoryComponentInstance = assemblyContext
 								.getEncapsulatedComponent__AssemblyContext();
 						if (repositoryComponentInstance.getEntityName().equals(
-								component)) {
+								componentName)) {
 							// 3) setRequiringAssemblyContext assemblyContext to
 							// assemblyConnector
 							assemblyConnector

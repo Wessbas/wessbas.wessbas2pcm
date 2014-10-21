@@ -1,4 +1,4 @@
-package org.fortiss.performance.javaee.pcm.model.generator.usagemodel;
+package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.old;
 
 import java.util.HashMap;
 
