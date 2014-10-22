@@ -10,7 +10,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
@@ -20,69 +19,65 @@ import de.uka.ipd.sdq.pcm.allocation.AllocationFactory;
 import de.uka.ipd.sdq.pcm.core.composition.AssemblyContext;
 import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceContainer;
 import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceEnvironment;
-import de.uka.ipd.sdq.pcm.system.System;
 
 /**
  * @author voegele
  * 
  */
-public class AllocationCreator extends CreatorTools {
+public class AllocationCreator {
+
+	CreatorTools creatorTools = CreatorTools.getInstance();
 
 	/**
 	 * @param resourceSet
 	 * @param workloadModel
 	 * @throws IOException
 	 */
-	public final void updateAllocation(final ResourceSet resourceSet,
-			WorkloadModel workloadModel) throws IOException {
+	public final void updateAllocation(WorkloadModel workloadModel)
+			throws IOException {
 
 		Resource allocationResource = null;
-		Allocation allocation = null;
 		EObject rootTarget;
 
-		log.info("- UPDATE ALLOCATION MODEL");
+		creatorTools.log.info("- UPDATE ALLOCATION MODEL");
 
 		// check if Allocation exists, if yes load it
 		if (Configuration.getAllocationFile().exists()) {
+
 			// load TargetResource
-			allocationResource = resourceSet.getResource(URI
-					.createFileURI(Configuration.getAllocationFile()
+			allocationResource = creatorTools.getResourceSet().getResource(
+					URI.createFileURI(Configuration.getAllocationFile()
 							.getAbsolutePath()), true);
 			allocationResource.load(Collections.EMPTY_MAP);
 			rootTarget = allocationResource.getContents().get(0);
-			allocation = (Allocation) rootTarget;
-
-			// load System
-			final Resource systemResource = resourceSet.getResource(URI
-					.createFileURI(Configuration.getSystemFile()
-							.getAbsolutePath()), true);
-			systemResource.load(Collections.EMPTY_MAP);
-			final EObject rootSystem = systemResource.getContents().get(0);
-			final System system = (System) rootSystem;
+			creatorTools.setThisAllocation((Allocation) rootTarget);
 
 			// load ResourceEnvironment
-			final Resource resourceEnvironmentResource = resourceSet
-					.getResource(URI.createFileURI(Configuration
-							.getResourceenvironmentFile().getAbsolutePath()),
-							true);
+			final Resource resourceEnvironmentResource = creatorTools
+					.getResourceSet().getResource(
+							URI.createFileURI(Configuration
+									.getResourceenvironmentFile()
+									.getAbsolutePath()), true);
 			resourceEnvironmentResource.load(Collections.EMPTY_MAP);
 			final EObject rootEnvironment = resourceEnvironmentResource
 					.getContents().get(0);
-			final ResourceEnvironment resourceEnvironment = (ResourceEnvironment) rootEnvironment;
+			creatorTools
+					.setThisResourceEnvironment((ResourceEnvironment) rootEnvironment);
 
 			// set Environments
-			allocation.setSystem_Allocation(system);
-			allocation
-					.setTargetResourceEnvironment_Allocation(resourceEnvironment);
+			creatorTools.getThisAllocation().setSystem_Allocation(
+					creatorTools.getThisSystem());
+			creatorTools.getThisAllocation()
+					.setTargetResourceEnvironment_Allocation(
+							creatorTools.getThisResourceEnvironment());
 
 			// allocate components to behaviorModelContainer
 			EList<BehaviorModel> behaviorModelList = workloadModel
 					.getBehaviorModels();
 
 			for (BehaviorModel behaviorModel : behaviorModelList) {
-				createAllocationContext(system, allocation,
-						resourceEnvironment,
-						getAssemblyName(behaviorModel.getName()),
+				createAllocationContext(
+						creatorTools.getAssemblyName(behaviorModel.getName()),
 						Configuration.BEHAVIORMODELCONTAINER);
 			}
 
@@ -101,19 +96,17 @@ public class AllocationCreator extends CreatorTools {
 	 * @param assemblyName
 	 * @param containerName
 	 */
-	private void createAllocationContext(final System system,
-			final Allocation allocation,
-			final ResourceEnvironment resourceEnvironment,
-			final String assemblyName, final String containerName) {
+	private void createAllocationContext(final String assemblyName,
+			final String containerName) {
 		// get all AllocationContexts
-		final EList<AssemblyContext> assemblyContexts = system
-				.getAssemblyContexts__ComposedStructure();
+		final EList<AssemblyContext> assemblyContexts = creatorTools
+				.getThisSystem().getAssemblyContexts__ComposedStructure();
 		for (final AssemblyContext assemblyContext : assemblyContexts) {
 			if (assemblyContext.getEntityName().equals(assemblyName)) {
 
 				boolean allocationExists = false;
-				final EList<AllocationContext> allocationContexts = allocation
-						.getAllocationContexts_Allocation();
+				final EList<AllocationContext> allocationContexts = creatorTools
+						.getThisAllocation().getAllocationContexts_Allocation();
 				for (final AllocationContext allocationContext : allocationContexts) {
 					if (allocationContext
 							.getResourceContainer_AllocationContext()
@@ -131,7 +124,8 @@ public class AllocationCreator extends CreatorTools {
 							.setAssemblyContext_AllocationContext(assemblyContext);
 					allocationContext.setEntityName(assemblyName);
 					// get all ResourceContainer
-					final EList<ResourceContainer> resourceContainers = resourceEnvironment
+					final EList<ResourceContainer> resourceContainers = creatorTools
+							.getThisResourceEnvironment()
 							.getResourceContainer_ResourceEnvironment();
 					for (final ResourceContainer resourceContainer : resourceContainers) {
 						if (resourceContainer.getEntityName().equals(
@@ -141,8 +135,9 @@ public class AllocationCreator extends CreatorTools {
 						}
 					}
 					// add allocationContext to allocation
-					allocation.getAllocationContexts_Allocation().add(
-							allocationContext);
+					creatorTools.getThisAllocation()
+							.getAllocationContexts_Allocation()
+							.add(allocationContext);
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration;
 
 public class Constants {
-	public static final String MODEL_DIRECTORY = "./workspace/specjPM";
+	public static final String MODEL_DIRECTORY = "./workspace/testPCM";
 	public static final String USAGE_MODEL_NAME = "test.usagemodel";
 	public static final String REPOSITORY_MODEL_NAME = "test.repository";
 	public static final String ALLOCATION_MODEL_NAME = "test.allocation";

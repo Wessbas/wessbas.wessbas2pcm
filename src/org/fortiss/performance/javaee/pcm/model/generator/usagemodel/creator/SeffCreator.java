@@ -41,8 +41,9 @@ import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
  * @author voegele
  * 
  */
-public class SeffCreator extends CreatorTools {
+public class SeffCreator {
 
+	CreatorTools creatorTools = CreatorTools.getInstance();
 	private ResourceSet thisResourceSet;
 	private Repository thisRepository;
 
@@ -58,7 +59,7 @@ public class SeffCreator extends CreatorTools {
 			final ResourceSet resourceSet, final Repository repository,
 			final BehaviorModel behaviorModel) {
 
-		log.info("- CREATE BEHAVIORMODEL SEFF: "
+		creatorTools.log.info("- CREATE BEHAVIORMODEL SEFF: "
 				+ seff.getDescribedService__SEFF().getEntityName());
 
 		try {
@@ -162,7 +163,7 @@ public class SeffCreator extends CreatorTools {
 		// TODO: Create better solution for target component
 		ExternalCallAction externalCallAction = createExternalCallAction(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
-						.getTargetState().getEId(), "_app");
+						.getTargetState().getEId(), "app");
 
 		if (externalCallAction != null) {
 			resourceDemandingBehaviour.getSteps_Behaviour().add(
@@ -230,7 +231,8 @@ public class SeffCreator extends CreatorTools {
 				.createPCMRandomVariable();
 
 		// load ResourceRepository
-		final ResourceRepository resourceRepository = getResourceRepository(resourceSet);
+		final ResourceRepository resourceRepository = creatorTools
+				.getResourceRepository(resourceSet);
 		for (final ResourceType resourceType : resourceRepository
 				.getAvailableResourceTypes_ResourceRepository()) {
 			if (resourceType instanceof ProcessingResourceType) {

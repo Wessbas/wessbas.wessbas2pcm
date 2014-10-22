@@ -3,8 +3,6 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel;
 import m4jdsl.WorkloadModel;
 import m4jdsl.impl.M4jdslPackageImpl;
 
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.AllocationCreator;
@@ -44,8 +42,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 
 		super.start(context);
-		// new resourceSet
-		final ResourceSet resourceSet = new ResourceSetImpl();
 
 		// initialize the model package;
 		M4jdslPackageImpl.init();
@@ -57,19 +53,19 @@ public class Activator extends AbstractUIPlugin {
 
 		// create new component in repository
 		RepositoryCreator repositoryCreator = new RepositoryCreator();
-		repositoryCreator.createWorkflowComponent(resourceSet, workloadModel);
+		repositoryCreator.createWorkflowComponent(workloadModel);
 
 		// create new assembly in system
 		SystemCreator systemCreator = new SystemCreator();
-		systemCreator.updateSystem(resourceSet, workloadModel);
+		systemCreator.updateSystem(workloadModel);
 
 		// update allocation model
 		AllocationCreator allocationCreator = new AllocationCreator();
-		allocationCreator.updateAllocation(resourceSet, workloadModel);
+		allocationCreator.updateAllocation(workloadModel);
 
 		// Create Usage Model and Update Performance Model
 		UsagemodelCreator usagemodelCreator = new UsagemodelCreator();
-		usagemodelCreator.createUsageModel(resourceSet, workloadModel);
+		usagemodelCreator.createUsageModel(workloadModel);
 
 		plugin = this;
 	}

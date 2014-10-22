@@ -11,7 +11,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
@@ -32,10 +31,9 @@ import de.uka.ipd.sdq.pcm.seff.SeffFactory;
  * @author voegele
  * 
  */
-public class RepositoryCreator extends CreatorTools {
+public class RepositoryCreator {
 
-	private ResourceSet thisResourceSet;
-	private Repository repository;
+	CreatorTools creatorTools = CreatorTools.getInstance();
 	private SeffCreator seffCreator = new SeffCreator();
 
 	/**
@@ -45,27 +43,25 @@ public class RepositoryCreator extends CreatorTools {
 	 * @param resourceSet
 	 * @param workloadModel
 	 */
-	public final void createWorkflowComponent(final ResourceSet resourceSet,
-			WorkloadModel workloadModel) {
+	public final void createWorkflowComponent(WorkloadModel workloadModel) {
 
-		thisResourceSet = resourceSet;
 		Resource repositoryResource = null;
 		EObject rootTarget;
 
 		try {
 
-			log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
+			creatorTools.log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
 
 			// check if repository exists, if yes load it
 			if (Configuration.getRepositoryFile().exists()) {
 
 				// load TargetResource
-				repositoryResource = thisResourceSet.getResource(URI
-						.createFileURI(Configuration.getRepositoryFile()
+				repositoryResource = creatorTools.getResourceSet().getResource(
+						URI.createFileURI(Configuration.getRepositoryFile()
 								.getAbsolutePath()), true);
 				repositoryResource.load(Collections.EMPTY_MAP);
 				rootTarget = repositoryResource.getContents().get(0);
-				repository = (Repository) rootTarget;
+				creatorTools.setThisRepository((Repository) rootTarget);
 
 				// get behaviorModels of the workloadModel
 				EList<BehaviorModel> behaviorModelList = workloadModel
@@ -78,6 +74,7 @@ public class RepositoryCreator extends CreatorTools {
 
 				// save
 				repositoryResource.save(null);
+
 			}
 
 		} catch (IOException e) {
@@ -98,7 +95,8 @@ public class RepositoryCreator extends CreatorTools {
 		OperationInterface myInterface = null;
 
 		// check if component exists
-		EList<RepositoryComponent> rc = repository.getComponents__Repository();
+		EList<RepositoryComponent> rc = creatorTools.getThisRepository()
+				.getComponents__Repository();
 		for (RepositoryComponent repositoryComponent : rc) {
 			if (repositoryComponent.getEntityName().equals(
 					behaviorModel.getName())) {
@@ -113,13 +111,15 @@ public class RepositoryCreator extends CreatorTools {
 			// create basicComponent
 			bc = RepositoryFactory.eINSTANCE.createBasicComponent();
 			bc.setEntityName(behaviorModel.getName());
-			repository.getComponents__Repository().add(bc);
+			creatorTools.getThisRepository().getComponents__Repository()
+					.add(bc);
 
 			// add interface
 			myInterface = RepositoryFactory.eINSTANCE
 					.createOperationInterface();
 			myInterface.setEntityName(behaviorModel.getName());
-			repository.getInterfaces__Repository().add(myInterface);
+			creatorTools.getThisRepository().getInterfaces__Repository()
+					.add(myInterface);
 
 			// provided role
 			OperationProvidedRole opProvRole = RepositoryFactory.eINSTANCE
@@ -211,8 +211,8 @@ public class RepositoryCreator extends CreatorTools {
 				.createResourceDemandingSEFF();
 		seff.setBasicComponent_ServiceEffectSpecification(bc);
 		seff.setDescribedService__SEFF(operationSignature);
-		seffCreator
-				.createSeff(seff, thisResourceSet, repository, behaviorModel);
+		seffCreator.createSeff(seff, creatorTools.getResourceSet(),
+				creatorTools.getThisRepository(), behaviorModel);
 	}
 
 }

@@ -10,7 +10,7 @@ Bundle-Activator: org.fortiss.performance.javaee.pcm.model.generator.usagemodel.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
- de.uka.ipd.sdq.pcm;bundle-version="3.2.1"
+ de.uka.ipd.sdq.pcm;bundle-version="3.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: de.uka.ipd.sdq.simucomframework.usage,

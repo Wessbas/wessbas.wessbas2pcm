@@ -10,7 +10,6 @@ import m4jdsl.WorkloadModel;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
@@ -20,7 +19,6 @@ import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
 import de.uka.ipd.sdq.pcm.repository.ProvidedRole;
-import de.uka.ipd.sdq.pcm.system.System;
 import de.uka.ipd.sdq.pcm.usagemodel.Branch;
 import de.uka.ipd.sdq.pcm.usagemodel.BranchTransition;
 import de.uka.ipd.sdq.pcm.usagemodel.ClosedWorkload;
@@ -28,7 +26,6 @@ import de.uka.ipd.sdq.pcm.usagemodel.EntryLevelSystemCall;
 import de.uka.ipd.sdq.pcm.usagemodel.ScenarioBehaviour;
 import de.uka.ipd.sdq.pcm.usagemodel.Start;
 import de.uka.ipd.sdq.pcm.usagemodel.Stop;
-import de.uka.ipd.sdq.pcm.usagemodel.UsageModel;
 import de.uka.ipd.sdq.pcm.usagemodel.UsageScenario;
 import de.uka.ipd.sdq.pcm.usagemodel.UsagemodelFactory;
 
@@ -38,30 +35,29 @@ import de.uka.ipd.sdq.pcm.usagemodel.UsagemodelFactory;
  * @author voegele
  * 
  */
-public class UsagemodelCreator extends CreatorTools {
+public class UsagemodelCreator {
 
-	private ResourceSet thisResourceSet;
+	CreatorTools creatorTools = CreatorTools.getInstance();
 
 	/**
 	 * @param resourceSet
 	 * @param workloadModel
 	 * @throws IOException
 	 */
-	public final void createUsageModel(final ResourceSet resourceSet,
-			WorkloadModel workloadModel) throws IOException {
+	public final void createUsageModel(WorkloadModel workloadModel)
+			throws IOException {
 
-		log.info("- CREATE USAGE MODEL");
-
-		thisResourceSet = resourceSet;
+		creatorTools.log.info("- CREATE USAGE MODEL");
 
 		// create usage model
-		Resource usageResource = thisResourceSet.createResource(URI
-				.createFileURI(Configuration.getUsageModelFile()
+		Resource usageResource = creatorTools.getResourceSet().createResource(
+				URI.createFileURI(Configuration.getUsageModelFile()
 						.getAbsolutePath()));
 
 		// create UsageModel
-		UsageModel usageModel = UsagemodelFactory.eINSTANCE.createUsageModel();
-		usageResource.getContents().add(usageModel);
+		creatorTools.setThisUsageModel(UsagemodelFactory.eINSTANCE
+				.createUsageModel());
+		usageResource.getContents().add(creatorTools.getThisUsageModel());
 
 		// create new UsageScenario
 		final UsageScenario usageScenario = UsagemodelFactory.eINSTANCE
@@ -84,7 +80,8 @@ public class UsagemodelCreator extends CreatorTools {
 		pcmRandomVariableThinkTime.setSpecification("0");
 		newWorkload.setThinkTime_ClosedWorkload(pcmRandomVariableThinkTime);
 		usageScenario.setWorkload_UsageScenario(newWorkload);
-		usageModel.getUsageScenario_UsageModel().add(usageScenario);
+		creatorTools.getThisUsageModel().getUsageScenario_UsageModel()
+				.add(usageScenario);
 		// save usageResource
 		usageResource.save(null);
 	}
@@ -151,16 +148,12 @@ public class UsagemodelCreator extends CreatorTools {
 	private EntryLevelSystemCall createEntryLevelSystemCall(
 			BehaviorModel behaviorModel) throws IOException {
 
-		// load System
-		final System system = getSystem(Configuration.getSystemFile(),
-				thisResourceSet);
-
 		// create new EntryLevelSystemCall
 		EntryLevelSystemCall entryLevelSystemCall = UsagemodelFactory.eINSTANCE
 				.createEntryLevelSystemCall();
 
 		// get available Operations and call each workflow operation once
-		final EList<ProvidedRole> providedRoles = system
+		final EList<ProvidedRole> providedRoles = creatorTools.getThisSystem()
 				.getProvidedRoles_InterfaceProvidingEntity();
 		for (final ProvidedRole providedRole : providedRoles) {
 			final OperationProvidedRole opr = (OperationProvidedRole) providedRole;
