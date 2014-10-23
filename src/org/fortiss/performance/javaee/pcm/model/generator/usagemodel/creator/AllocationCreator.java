@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.Collections;
 
 import m4jdsl.BehaviorModel;
-import m4jdsl.WorkloadModel;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.allocation.Allocation;
 import de.uka.ipd.sdq.pcm.allocation.AllocationContext;
@@ -21,19 +19,21 @@ import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceContainer;
 import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceEnvironment;
 
 /**
+ * Allocated the new assemblyContexts to the resourceenvironment.
+ * 
  * @author voegele
  * 
  */
 public class AllocationCreator {
 
-	CreatorTools creatorTools = CreatorTools.getInstance();
+	private CreatorTools creatorTools = CreatorTools.getInstance();
 
 	/**
 	 * @param resourceSet
 	 * @param workloadModel
 	 * @throws IOException
 	 */
-	public final void updateAllocation(WorkloadModel workloadModel)
+	public final void updateAllocation()
 			throws IOException {
 
 		Resource allocationResource = null;
@@ -72,7 +72,7 @@ public class AllocationCreator {
 							creatorTools.getThisResourceEnvironment());
 
 			// allocate components to behaviorModelContainer
-			EList<BehaviorModel> behaviorModelList = workloadModel
+			EList<BehaviorModel> behaviorModelList = creatorTools.getThisWorkloadModel()
 					.getBehaviorModels();
 
 			for (BehaviorModel behaviorModel : behaviorModelList) {
@@ -90,9 +90,6 @@ public class AllocationCreator {
 	/**
 	 * Create new allocationContext.
 	 * 
-	 * @param system
-	 * @param allocation
-	 * @param resourceEnvironment
 	 * @param assemblyName
 	 * @param containerName
 	 */

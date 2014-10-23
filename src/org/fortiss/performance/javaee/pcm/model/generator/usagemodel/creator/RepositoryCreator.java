@@ -5,14 +5,12 @@ import java.util.Collections;
 
 import m4jdsl.BehaviorModel;
 import m4jdsl.MarkovState;
-import m4jdsl.WorkloadModel;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
@@ -26,24 +24,24 @@ import de.uka.ipd.sdq.pcm.seff.SeffFactory;
 
 /**
  * This class creates new basic components into the existing PCM Repository
- * Model.
+ * Model representing the behaviorModels of the workload model.
  * 
  * @author voegele
  * 
  */
 public class RepositoryCreator {
 
-	CreatorTools creatorTools = CreatorTools.getInstance();
+	private CreatorTools creatorTools = CreatorTools.getInstance();
 	private SeffCreator seffCreator = new SeffCreator();
 
 	/**
 	 * 
-	 * creates PCM Repository Model.
+	 * Initial method. Reads the existing repository model.
 	 * 
 	 * @param resourceSet
 	 * @param workloadModel
 	 */
-	public final void createWorkflowComponent(WorkloadModel workloadModel) {
+	public final void createWorkflowComponent() {
 
 		Resource repositoryResource = null;
 		EObject rootTarget;
@@ -64,7 +62,7 @@ public class RepositoryCreator {
 				creatorTools.setThisRepository((Repository) rootTarget);
 
 				// get behaviorModels of the workloadModel
-				EList<BehaviorModel> behaviorModelList = workloadModel
+				EList<BehaviorModel> behaviorModelList = creatorTools.getThisWorkloadModel()
 						.getBehaviorModels();
 
 				// create a new component per behaviorModel
@@ -83,14 +81,11 @@ public class RepositoryCreator {
 	}
 
 	/**
-	 * 
 	 * Create new behaviorModel component.
 	 * 
-	 * @param componentName
-	 * @param OperationSignature
-	 * @param navigationRules
+	 * @param behaviorModel
 	 */
-	private void createBehaviorModelComponent(BehaviorModel behaviorModel) {
+	private void createBehaviorModelComponent(final BehaviorModel behaviorModel) {
 		BasicComponent bc = null;
 		OperationInterface myInterface = null;
 
@@ -133,12 +128,6 @@ public class RepositoryCreator {
 			bc.getProvidedRoles_InterfaceProvidingEntity().add(opProvRole);
 
 		}
-
-		// setRequiredRoles to all other components
-		// TODO: Set required roles only the really required components, not to
-		// all
-		// createRequiredRoleBetweenComponents(bc.getEntityName(), null,
-		// repository);
 
 		// create a operationSignature for each markovState having outgoing
 		// transitions in the behaviorModel
@@ -202,10 +191,10 @@ public class RepositoryCreator {
 	 * 
 	 * @param operationSignature
 	 * @param bc
-	 * @param resourceDemand
+	 * @param behaviorModel
 	 */
 	private void seffInitializer(final OperationSignature operationSignature,
-			final BasicComponent bc, BehaviorModel behaviorModel) {
+			final BasicComponent bc, final BehaviorModel behaviorModel) {
 		// create SEFF
 		ResourceDemandingSEFF seff = SeffFactory.eINSTANCE
 				.createResourceDemandingSEFF();

@@ -5,13 +5,11 @@ import java.io.IOException;
 import m4jdsl.BehaviorMix;
 import m4jdsl.BehaviorModel;
 import m4jdsl.RelativeFrequency;
-import m4jdsl.WorkloadModel;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
@@ -37,14 +35,12 @@ import de.uka.ipd.sdq.pcm.usagemodel.UsagemodelFactory;
  */
 public class UsagemodelCreator {
 
-	CreatorTools creatorTools = CreatorTools.getInstance();
+	private CreatorTools creatorTools = CreatorTools.getInstance();
 
 	/**
-	 * @param resourceSet
-	 * @param workloadModel
 	 * @throws IOException
 	 */
-	public final void createUsageModel(WorkloadModel workloadModel)
+	public final void createUsageModel()
 			throws IOException {
 
 		creatorTools.log.info("- CREATE USAGE MODEL");
@@ -68,12 +64,12 @@ public class UsagemodelCreator {
 		final ScenarioBehaviour scenarioBehaviour = UsagemodelFactory.eINSTANCE
 				.createScenarioBehaviour();
 		scenarioBehaviour.setEntityName("DefaultScenario");
-		createScenarioBehavior(scenarioBehaviour, workloadModel);
+		createScenarioBehavior(scenarioBehaviour);
 		usageScenario.setScenarioBehaviour_UsageScenario(scenarioBehaviour);
 		ClosedWorkload newWorkload = UsagemodelFactory.eINSTANCE
 				.createClosedWorkload();
 		// TODO: Formula of workloadModel must be integrated
-		newWorkload.setPopulation(Integer.parseInt(workloadModel
+		newWorkload.setPopulation(Integer.parseInt(creatorTools.getThisWorkloadModel()
 				.getWorkloadIntensity().getFormula()));
 		PCMRandomVariable pcmRandomVariableThinkTime = CoreFactory.eINSTANCE
 				.createPCMRandomVariable();
@@ -90,16 +86,15 @@ public class UsagemodelCreator {
 	 * Create new ScenarioBehavior.
 	 * 
 	 * @param scenarioBehaviour
-	 * @param workloadModel
 	 * @throws IOException
 	 */
 	private final void createScenarioBehavior(
-			ScenarioBehaviour scenarioBehaviour, WorkloadModel workloadModel)
+			final ScenarioBehaviour scenarioBehaviour)
 			throws IOException {
 		// create start, stop and branch element
 		Start start = UsagemodelFactory.eINSTANCE.createStart();
 		Stop stop = UsagemodelFactory.eINSTANCE.createStop();
-		Branch branch = createBranch(workloadModel);
+		Branch branch = createBranch();
 
 		// add elements to scenarioBehavior
 		start.setScenarioBehaviour_AbstractUserAction(scenarioBehaviour);
@@ -117,17 +112,16 @@ public class UsagemodelCreator {
 	 * Create new branch. Each Transition within this branch is a separate
 	 * behaviorModel.
 	 * 
-	 * @param workloadModel
-	 * @return Branch
+	 * @return
 	 * @throws IOException
 	 */
-	private Branch createBranch(WorkloadModel workloadModel) throws IOException {
+	private Branch createBranch() throws IOException {
 		Branch branch = UsagemodelFactory.eINSTANCE.createBranch();
 		branch.setEntityName("BehaviorMix");
 
-		EList<BehaviorModel> behaviorModelsList = workloadModel
+		EList<BehaviorModel> behaviorModelsList = creatorTools.getThisWorkloadModel()
 				.getBehaviorModels();
-		BehaviorMix behaviorMix = workloadModel.getBehaviorMix();
+		BehaviorMix behaviorMix = creatorTools.getThisWorkloadModel().getBehaviorMix();
 		EList<RelativeFrequency> relativeFrequencyList = behaviorMix
 				.getRelativeFrequencies();
 		for (int i = 0; i < relativeFrequencyList.size(); i++) {
@@ -142,11 +136,11 @@ public class UsagemodelCreator {
 	 * component in the repository model.
 	 * 
 	 * @param behaviorModel
-	 * @return EntryLevelSystemCall
+	 * @return
 	 * @throws IOException
 	 */
 	private EntryLevelSystemCall createEntryLevelSystemCall(
-			BehaviorModel behaviorModel) throws IOException {
+			final BehaviorModel behaviorModel) throws IOException {
 
 		// create new EntryLevelSystemCall
 		EntryLevelSystemCall entryLevelSystemCall = UsagemodelFactory.eINSTANCE

@@ -9,7 +9,6 @@ import m4jdsl.Transition;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
@@ -38,12 +37,15 @@ import de.uka.ipd.sdq.pcm.seff.seff_performance.ParametricResourceDemand;
 import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
 
 /**
+ * This class is called from the RepositoryCreator class. 
+ * It created seff based on the wmarkovStates of the workload model. 
+ * 
  * @author voegele
  * 
  */
 public class SeffCreator {
 
-	CreatorTools creatorTools = CreatorTools.getInstance();
+	private CreatorTools creatorTools = CreatorTools.getInstance();
 	private ResourceSet thisResourceSet;
 	private Repository thisRepository;
 
@@ -129,12 +131,13 @@ public class SeffCreator {
 	 * @param transition
 	 * @param seff
 	 * @param behaviorModel
-	 * @return ProbabilisticBranchTransition
+	 * @return
 	 * @throws IOException
 	 */
 	private ProbabilisticBranchTransition createProbabilisticBranchTransition(
-			Transition transition, final ResourceDemandingSEFF seff,
-			BehaviorModel behaviorModel) throws IOException {
+			final Transition transition, final ResourceDemandingSEFF seff,
+			final BehaviorModel behaviorModel) throws IOException {
+		
 		ProbabilisticBranchTransition probabilisticBranchTransition = SeffFactory.eINSTANCE
 				.createProbabilisticBranchTransition();
 		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
@@ -263,7 +266,8 @@ public class SeffCreator {
 	 * 
 	 * @param bc
 	 * @param operationName
-	 * @return ExternalCallAction
+	 * @param componentName
+	 * @return
 	 */
 	private ExternalCallAction createExternalCallAction(
 			final BasicComponent bc, final String operationName,
@@ -299,15 +303,13 @@ public class SeffCreator {
 	}
 
 	/**
-	 * 
 	 * Set required role to all required interfaces. When toComponent is set to
 	 * null then the required role will be set to all existing interfaces.
 	 * 
-	 * @param componentName
-	 * 
+	 * @param fromComponent
 	 * @param toInterface
-	 * 
 	 * @param repository
+	 * @return OperationRequiredRole
 	 */
 	private OperationRequiredRole createRequiredRoleBetweenComponents(
 			final String fromComponent, final String toInterface,
@@ -325,10 +327,6 @@ public class SeffCreator {
 			if (repositoryComponent.getEntityName().equals(fromComponent)) {
 				for (final Interface interfaceInstance : interfaces) {
 
-					// when toComponent null ist dann wird eine verbindung zu
-					// alles interfaces hergestellt,
-					// wenn toInterface einen Wert hat dann nur zu diesem
-					// Interface
 					if (toInterface == null
 							|| interfaceInstance.getEntityName().equals(
 									toInterface)) {
@@ -364,7 +362,6 @@ public class SeffCreator {
 				}
 			}
 		}
-
 		return opReqRole;
 	}
 

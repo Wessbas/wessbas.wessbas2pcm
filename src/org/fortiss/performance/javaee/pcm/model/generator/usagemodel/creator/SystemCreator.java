@@ -5,14 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import m4jdsl.BehaviorModel;
-import m4jdsl.WorkloadModel;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.util.CreatorTools;
 
 import de.uka.ipd.sdq.pcm.core.composition.AssemblyConnector;
 import de.uka.ipd.sdq.pcm.core.composition.AssemblyContext;
@@ -32,7 +30,7 @@ import de.uka.ipd.sdq.pcm.system.System;
 
 /**
  * This class updates the system model. For each newly created behaviorComponent
- * in the repository, create a new Assembly.
+ * in the repository, create a new assembly.
  * 
  * @author voegele
  * 
@@ -44,7 +42,7 @@ public class SystemCreator {
 	/**
 	 * updates System Model.
 	 */
-	public final void updateSystem(WorkloadModel workloadModel) {
+	public final void updateSystem() {
 
 		Resource systemResource = null;
 		EObject rootSystem;
@@ -63,7 +61,7 @@ public class SystemCreator {
 				rootSystem = systemResource.getContents().get(0);
 				creatorTools.setThisSystem((System) rootSystem);
 
-				EList<BehaviorModel> behaviorModels = workloadModel
+				EList<BehaviorModel> behaviorModels = creatorTools.getThisWorkloadModel()
 						.getBehaviorModels();
 
 				// create an assembly for each behaviorModel
@@ -94,11 +92,8 @@ public class SystemCreator {
 	}
 
 	/**
-	 * 
 	 * Create new OperationProvidedRole.
 	 * 
-	 * @param system
-	 * @param repository
 	 * @param componentName
 	 */
 	private final void createOperationProvidedRole(final String componentName) {
@@ -159,10 +154,9 @@ public class SystemCreator {
 	/**
 	 * Create new assembly with the specified name.
 	 * 
-	 * @param system
-	 * @param repository
 	 * @param assemblyName
 	 * @param assemblyContextName
+	 * @return AssemblyContext
 	 */
 	private AssemblyContext createAssemblyContext(final String assemblyName,
 			final String assemblyContextName) {
@@ -293,74 +287,4 @@ public class SystemCreator {
 		return null;
 	}
 
-	// /**
-	// * create new AssemplyConnector between the component and the required
-	// * assemplies.
-	// *
-	// * @param system
-	// * @param repository
-	// * @param componentName
-	// */
-	// private final void createMissingAssemblyConnector(
-	// final String assemblyName, final String componentName) {
-	//
-	// EList<AssemblyContext> assemblyContextsRequired = creatorTools
-	// .getThisSystem().getAssemblyContexts__ComposedStructure();
-	// for (AssemblyContext assemblyContextRequired : assemblyContextsRequired)
-	// {
-	// if (assemblyName.equals(assemblyContextRequired.getEntityName())) {
-	// RepositoryComponent repositoryComponentRequired = assemblyContextRequired
-	// .getEncapsulatedComponent__AssemblyContext();
-	// EList<RequiredRole> requiredRoles = repositoryComponentRequired
-	// .getRequiredRoles_InterfaceRequiringEntity();
-	// for (RequiredRole requiredRole : requiredRoles) {
-	// OperationRequiredRole operationRequiredRole = (OperationRequiredRole)
-	// requiredRole;
-	// OperationInterface operationInterfaceRequiring = operationRequiredRole
-	// .getRequiredInterface__OperationRequiredRole();
-	// EList<AssemblyContext> assemblyContextsProvide = creatorTools
-	// .getThisSystem()
-	// .getAssemblyContexts__ComposedStructure();
-	// for (AssemblyContext assemblyContextProvided : assemblyContextsProvide) {
-	// RepositoryComponent repositoryComponentProvide = assemblyContextProvided
-	// .getEncapsulatedComponent__AssemblyContext();
-	// if (repositoryComponentProvide.getEntityName().equals(
-	// operationRequiredRole.getEntityName())) {
-	// EList<ProvidedRole> providedRoles = repositoryComponentProvide
-	// .getProvidedRoles_InterfaceProvidingEntity();
-	// for (ProvidedRole providedRole : providedRoles) {
-	// OperationProvidedRole operationProvidedRole = (OperationProvidedRole)
-	// providedRole;
-	// OperationInterface operationInterfaceProvided = operationProvidedRole
-	// .getProvidedInterface__OperationProvidedRole();
-	// if (operationInterfaceRequiring.getId().equals(
-	// operationInterfaceProvided.getId())) {
-	// AssemblyConnector assemblyConnector = CompositionFactory.eINSTANCE
-	// .createAssemblyConnector();
-	// assemblyConnector
-	// .setProvidedRole_AssemblyConnector(operationProvidedRole);
-	// assemblyConnector
-	// .setRequiredRole_AssemblyConnector(operationRequiredRole);
-	// assemblyConnector
-	// .setProvidingAssemblyContext_AssemblyConnector(assemblyContextProvided);
-	// assemblyConnector
-	// .setRequiringAssemblyContext_AssemblyConnector(assemblyContextRequired);
-	// assemblyConnector
-	// .setEntityName("AssemblyConnector_"
-	// + assemblyContextRequired
-	// .getEntityName()
-	// + "_"
-	// + assemblyContextProvided
-	// .getEntityName());
-	// creatorTools.getThisSystem()
-	// .getConnectors__ComposedStructure()
-	// .add(assemblyConnector);
-	// }
-	// }
-	// }
-	// }
-	// }
-	// }
-	// }
-	// }
 }

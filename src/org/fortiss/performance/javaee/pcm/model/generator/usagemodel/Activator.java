@@ -1,15 +1,10 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel;
 
-import m4jdsl.WorkloadModel;
-import m4jdsl.impl.M4jdslPackageImpl;
-
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.AllocationCreator;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.RepositoryCreator;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.SystemCreator;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.UsagemodelCreator;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.wessbassdsl.XmiEcoreHandler;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -43,29 +38,21 @@ public class Activator extends AbstractUIPlugin {
 
 		super.start(context);
 
-		// initialize the model package;
-		M4jdslPackageImpl.init();
-
-		// Read Workload Model from XMI File
-		// might throw an IOException;
-		final WorkloadModel workloadModel = (WorkloadModel) XmiEcoreHandler
-				.getInstance().xmiToEcore(Constants.XMI_FILE, "xmi");
-
 		// create new component in repository
 		RepositoryCreator repositoryCreator = new RepositoryCreator();
-		repositoryCreator.createWorkflowComponent(workloadModel);
+		repositoryCreator.createWorkflowComponent();
 
 		// create new assembly in system
 		SystemCreator systemCreator = new SystemCreator();
-		systemCreator.updateSystem(workloadModel);
+		systemCreator.updateSystem();
 
 		// update allocation model
 		AllocationCreator allocationCreator = new AllocationCreator();
-		allocationCreator.updateAllocation(workloadModel);
+		allocationCreator.updateAllocation();
 
 		// Create Usage Model and Update Performance Model
 		UsagemodelCreator usagemodelCreator = new UsagemodelCreator();
-		usagemodelCreator.createUsageModel(workloadModel);
+		usagemodelCreator.createUsageModel();
 
 		plugin = this;
 	}
