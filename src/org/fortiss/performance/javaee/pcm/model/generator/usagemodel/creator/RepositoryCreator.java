@@ -1,22 +1,14 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
-import java.util.Collections;
-
 import m4jdsl.BehaviorModel;
 import m4jdsl.MarkovState;
-
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
-import de.uka.ipd.sdq.pcm.repository.Repository;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
 import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
 import de.uka.ipd.sdq.pcm.seff.ResourceDemandingSEFF;
@@ -40,43 +32,26 @@ public class RepositoryCreator {
 	 * 
 	 * @param resourceSet
 	 * @param workloadModel
+	 * @throws IOException 
 	 */
-	public final void createWorkflowComponent() {
+	public final void createWorkflowComponent() throws IOException {
+		creatorTools.log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
 
-		Resource repositoryResource = null;
-		EObject rootTarget;
+		// check if repository exists, if yes load it
+		if (Configuration.getRepositoryFile().exists()) {			
 
-		try {
+			// get behaviorModels of the workloadModel
+			EList<BehaviorModel> behaviorModelList = creatorTools.getThisWorkloadModel()
+					.getBehaviorModels();
 
-			creatorTools.log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
-
-			// check if repository exists, if yes load it
-			if (Configuration.getRepositoryFile().exists()) {
-
-				// load TargetResource
-				repositoryResource = creatorTools.getResourceSet().getResource(
-						URI.createFileURI(Configuration.getRepositoryFile()
-								.getAbsolutePath()), true);
-				repositoryResource.load(Collections.EMPTY_MAP);
-				rootTarget = repositoryResource.getContents().get(0);
-				creatorTools.setThisRepository((Repository) rootTarget);
-
-				// get behaviorModels of the workloadModel
-				EList<BehaviorModel> behaviorModelList = creatorTools.getThisWorkloadModel()
-						.getBehaviorModels();
-
-				// create a new component per behaviorModel
-				for (BehaviorModel behaviorModel : behaviorModelList) {
-					createBehaviorModelComponent(behaviorModel);
-				}
-
-				// save
-				repositoryResource.save(null);
-
+			// create a new component per behaviorModel
+			for (BehaviorModel behaviorModel : behaviorModelList) {
+				createBehaviorModelComponent(behaviorModel);
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
+			// save
+			creatorTools.saveRepository();
+
 		}
 	}
 
@@ -84,8 +59,9 @@ public class RepositoryCreator {
 	 * Create new behaviorModel component.
 	 * 
 	 * @param behaviorModel
+	 * @throws IOException 
 	 */
-	private void createBehaviorModelComponent(final BehaviorModel behaviorModel) {
+	private void createBehaviorModelComponent(final BehaviorModel behaviorModel) throws IOException {
 		BasicComponent bc = null;
 		OperationInterface myInterface = null;
 
@@ -192,9 +168,10 @@ public class RepositoryCreator {
 	 * @param operationSignature
 	 * @param bc
 	 * @param behaviorModel
+	 * @throws IOException 
 	 */
 	private void seffInitializer(final OperationSignature operationSignature,
-			final BasicComponent bc, final BehaviorModel behaviorModel) {
+			final BasicComponent bc, final BehaviorModel behaviorModel) throws IOException {
 		// create SEFF
 		ResourceDemandingSEFF seff = SeffFactory.eINSTANCE
 				.createResourceDemandingSEFF();

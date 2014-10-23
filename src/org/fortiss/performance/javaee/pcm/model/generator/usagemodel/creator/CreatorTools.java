@@ -13,6 +13,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.wessbassdsl.XmiEcoreHandler;
 
@@ -22,6 +23,7 @@ import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceEnvironment;
 import de.uka.ipd.sdq.pcm.resourcetype.ResourceRepository;
 import de.uka.ipd.sdq.pcm.system.System;
 import de.uka.ipd.sdq.pcm.usagemodel.UsageModel;
+import de.uka.ipd.sdq.pcm.usagemodel.UsagemodelFactory;
 
 /**
  * @author voegele
@@ -29,6 +31,7 @@ import de.uka.ipd.sdq.pcm.usagemodel.UsageModel;
  */
 public class CreatorTools {
 
+	// singleton
 	private static CreatorTools instance = null;
 
 	private CreatorTools() {
@@ -47,12 +50,26 @@ public class CreatorTools {
 	public final Logger log = Logger.getAnonymousLogger();
 
 	private Repository thisRepository;
+	private Resource repositoryResource;
+	private EObject rootRepository;
+	
 	private System thisSystem;
+	private Resource systemResource;
+	private EObject rootSystem;
+	
 	private Allocation thisAllocation;
+	private Resource allocationResource;
+	private EObject rootAllocation;
+	
 	private ResourceEnvironment thisResourceEnvironment;
+	private Resource resourceEnvironmentResource;
+	private EObject rootEnvironment;
+	
 	private UsageModel thisUsageModel;
+	private Resource usageResource;	
+	
 	private ResourceSet thisResourceSet;
-	private WorkloadModel thisWorkloadModel;
+	private WorkloadModel thisWorkloadModel;	
 
 	/**
 	 * @return the thisWorkloadModel
@@ -77,78 +94,125 @@ public class CreatorTools {
 
 	/**
 	 * @return the thisRepository
+	 * @throws IOException 
 	 */
-	protected final Repository getThisRepository() {
+	protected final Repository getThisRepository() throws IOException {
+		if (thisRepository == null) {
+			repositoryResource = getResourceSet().getResource(
+					URI.createFileURI(Configuration.getRepositoryFile()
+							.getAbsolutePath()), true);
+			repositoryResource.load(Collections.EMPTY_MAP);
+			rootRepository = repositoryResource.getContents().get(0);
+			thisRepository = (Repository) rootRepository;
+		}
 		return thisRepository;
 	}
-
+	
 	/**
-	 * @param thisRepository
-	 *            the thisRepository to set
+	 * @throws IOException
 	 */
-	protected final void setThisRepository(Repository thisRepository) {
-		this.thisRepository = thisRepository;
+	protected final void saveRepository() throws IOException {
+		this.repositoryResource.save(null);
 	}
 
 	/**
 	 * @return the thisSystem
+	 * @throws IOException 
 	 */
-	protected final System getThisSystem() {
+	protected final System getThisSystem() throws IOException {
+		if (thisSystem == null) {
+			systemResource = getResourceSet().getResource(
+					URI.createFileURI(Configuration.getSystemFile()
+							.getAbsolutePath()), true);
+			systemResource.load(Collections.EMPTY_MAP);
+			rootSystem = systemResource.getContents().get(0);
+			thisSystem = (System) rootSystem;
+		}
+		
 		return thisSystem;
 	}
-
+	
 	/**
-	 * @param thisSystem
-	 *            the thisSystem to set
+	 * @throws IOException
 	 */
-	protected final void setThisSystem(System thisSystem) {
-		this.thisSystem = thisSystem;
+	protected final void saveSystem() throws IOException {
+		this.systemResource.save(null);
 	}
 
 	/**
 	 * @return the thisAllocation
+	 * @throws IOException 
 	 */
-	protected final Allocation getThisAllocation() {
+	protected final Allocation getThisAllocation() throws IOException {
+		if (thisAllocation == null) {
+			// load Allocation
+			allocationResource = getResourceSet().getResource(
+					URI.createFileURI(Configuration.getAllocationFile()
+							.getAbsolutePath()), true);
+			allocationResource.load(Collections.EMPTY_MAP);
+			rootAllocation = allocationResource.getContents().get(0);
+			thisAllocation = (Allocation) rootAllocation;			
+		}
 		return thisAllocation;
 	}
-
+	
 	/**
-	 * @param thisAllocation
-	 *            the thisAllocation to set
+	 * @throws IOException
 	 */
-	protected final void setThisAllocation(Allocation thisAllocation) {
-		this.thisAllocation = thisAllocation;
+	protected final void saveAllocation() throws IOException {
+		this.allocationResource.save(null);
 	}
 
 	/**
 	 * @return the thisResourceEnvironment
+	 * @throws IOException 
 	 */
-	protected final ResourceEnvironment getThisResourceEnvironment() {
+	protected final ResourceEnvironment getThisResourceEnvironment() throws IOException {
+		if (thisResourceEnvironment == null) {
+			// load ResourceEnvironment
+			resourceEnvironmentResource = getResourceSet().getResource(
+							URI.createFileURI(Configuration
+									.getResourceenvironmentFile()
+									.getAbsolutePath()), true);
+			resourceEnvironmentResource.load(Collections.EMPTY_MAP);
+			rootEnvironment = resourceEnvironmentResource
+					.getContents().get(0);
+			thisResourceEnvironment = (ResourceEnvironment) rootEnvironment;
+		}
 		return thisResourceEnvironment;
 	}
-
+	
 	/**
-	 * @param thisResourceEnvironment
-	 *            the thisResourceEnvironment to set
+	 * @throws IOException
 	 */
-	protected final void setThisResourceEnvironment(
-			ResourceEnvironment thisResourceEnvironment) {
-		this.thisResourceEnvironment = thisResourceEnvironment;
+	protected final void saveResourceEnvironment() throws IOException {
+		this.usageResource.save(null);
 	}
 
 	/**
 	 * @return the thisUsageModel
 	 */
 	protected final UsageModel getThisUsageModel() {
+		if (thisUsageModel == null) {
+			// create usage model
+			usageResource = getResourceSet().createResource(
+					URI.createFileURI(Configuration.getUsageModelFile()
+							.getAbsolutePath()));
+
+			// create UsageModel
+			thisUsageModel = UsagemodelFactory.eINSTANCE
+					.createUsageModel();
+			usageResource.getContents().add(thisUsageModel);
+			
+		}
 		return thisUsageModel;
 	}
-
+	
 	/**
-	 * @param thisUsageModel
-	 *            the thisUsageModel to set
+	 * @throws IOException
 	 */
-	protected final void setThisUsageModel(UsageModel thisUsageModel) {
-		this.thisUsageModel = thisUsageModel;
+	protected final void saveUsageModel() throws IOException {
+		this.usageResource.save(null);
 	}
 
 	/**

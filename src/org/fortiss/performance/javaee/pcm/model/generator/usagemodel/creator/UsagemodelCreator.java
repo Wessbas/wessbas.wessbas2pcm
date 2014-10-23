@@ -7,10 +7,6 @@ import m4jdsl.BehaviorModel;
 import m4jdsl.RelativeFrequency;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
@@ -45,16 +41,6 @@ public class UsagemodelCreator {
 
 		creatorTools.log.info("- CREATE USAGE MODEL");
 
-		// create usage model
-		Resource usageResource = creatorTools.getResourceSet().createResource(
-				URI.createFileURI(Configuration.getUsageModelFile()
-						.getAbsolutePath()));
-
-		// create UsageModel
-		creatorTools.setThisUsageModel(UsagemodelFactory.eINSTANCE
-				.createUsageModel());
-		usageResource.getContents().add(creatorTools.getThisUsageModel());
-
 		// create new UsageScenario
 		final UsageScenario usageScenario = UsagemodelFactory.eINSTANCE
 				.createUsageScenario();
@@ -79,7 +65,7 @@ public class UsagemodelCreator {
 		creatorTools.getThisUsageModel().getUsageScenario_UsageModel()
 				.add(usageScenario);
 		// save usageResource
-		usageResource.save(null);
+		creatorTools.saveUsageModel();
 	}
 
 	/**

@@ -1,15 +1,11 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import m4jdsl.BehaviorModel;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 
 import de.uka.ipd.sdq.pcm.core.composition.AssemblyConnector;
@@ -26,7 +22,6 @@ import de.uka.ipd.sdq.pcm.repository.ProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
 import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
 import de.uka.ipd.sdq.pcm.repository.RequiredRole;
-import de.uka.ipd.sdq.pcm.system.System;
 
 /**
  * This class updates the system model. For each newly created behaviorComponent
@@ -44,22 +39,14 @@ public class SystemCreator {
 	 */
 	public final void updateSystem() {
 
-		Resource systemResource = null;
-		EObject rootSystem;
+		
 
 		try {
 
 			creatorTools.log.info("- UPDATE SYSTEM MODEL");
 
 			// load system
-			if (Configuration.getSystemFile().exists()) {
-
-				systemResource = creatorTools.getResourceSet().getResource(
-						URI.createFileURI(Configuration.getSystemFile()
-								.getAbsolutePath()), true);
-				systemResource.load(Collections.EMPTY_MAP);
-				rootSystem = systemResource.getContents().get(0);
-				creatorTools.setThisSystem((System) rootSystem);
+			if (Configuration.getSystemFile().exists()) {				
 
 				EList<BehaviorModel> behaviorModels = creatorTools.getThisWorkloadModel()
 						.getBehaviorModels();
@@ -82,7 +69,7 @@ public class SystemCreator {
 				// assemblies
 				connectAssemblies(creatorTools.getThisSystem());
 
-				systemResource.save(null);
+				creatorTools.saveSystem();
 
 			}
 
@@ -95,8 +82,9 @@ public class SystemCreator {
 	 * Create new OperationProvidedRole.
 	 * 
 	 * @param componentName
+	 * @throws IOException 
 	 */
-	private final void createOperationProvidedRole(final String componentName) {
+	private final void createOperationProvidedRole(final String componentName) throws IOException {
 
 		// create new OperationProvidedRole
 		final OperationProvidedRole operationProvidedRole = RepositoryFactory.eINSTANCE
@@ -157,9 +145,10 @@ public class SystemCreator {
 	 * @param assemblyName
 	 * @param assemblyContextName
 	 * @return AssemblyContext
+	 * @throws IOException 
 	 */
 	private AssemblyContext createAssemblyContext(final String assemblyName,
-			final String assemblyContextName) {
+			final String assemblyContextName) throws IOException {
 
 		AssemblyContext assemblyContext = null;
 

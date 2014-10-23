@@ -1,22 +1,13 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
-import java.util.Collections;
-
 import m4jdsl.BehaviorModel;
-
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
-
-import de.uka.ipd.sdq.pcm.allocation.Allocation;
 import de.uka.ipd.sdq.pcm.allocation.AllocationContext;
 import de.uka.ipd.sdq.pcm.allocation.AllocationFactory;
 import de.uka.ipd.sdq.pcm.core.composition.AssemblyContext;
 import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceContainer;
-import de.uka.ipd.sdq.pcm.resourceenvironment.ResourceEnvironment;
 
 /**
  * Allocated the new assemblyContexts to the resourceenvironment.
@@ -36,34 +27,11 @@ public class AllocationCreator {
 	public final void updateAllocation()
 			throws IOException {
 
-		Resource allocationResource = null;
-		EObject rootTarget;
-
 		creatorTools.log.info("- UPDATE ALLOCATION MODEL");
 
 		// check if Allocation exists, if yes load it
 		if (Configuration.getAllocationFile().exists()) {
-
-			// load TargetResource
-			allocationResource = creatorTools.getResourceSet().getResource(
-					URI.createFileURI(Configuration.getAllocationFile()
-							.getAbsolutePath()), true);
-			allocationResource.load(Collections.EMPTY_MAP);
-			rootTarget = allocationResource.getContents().get(0);
-			creatorTools.setThisAllocation((Allocation) rootTarget);
-
-			// load ResourceEnvironment
-			final Resource resourceEnvironmentResource = creatorTools
-					.getResourceSet().getResource(
-							URI.createFileURI(Configuration
-									.getResourceenvironmentFile()
-									.getAbsolutePath()), true);
-			resourceEnvironmentResource.load(Collections.EMPTY_MAP);
-			final EObject rootEnvironment = resourceEnvironmentResource
-					.getContents().get(0);
-			creatorTools
-					.setThisResourceEnvironment((ResourceEnvironment) rootEnvironment);
-
+			
 			// set Environments
 			creatorTools.getThisAllocation().setSystem_Allocation(
 					creatorTools.getThisSystem());
@@ -82,7 +50,7 @@ public class AllocationCreator {
 			}
 
 			// save
-			allocationResource.save(null);
+			creatorTools.saveAllocation();
 
 		}
 	}
@@ -92,9 +60,10 @@ public class AllocationCreator {
 	 * 
 	 * @param assemblyName
 	 * @param containerName
+	 * @throws IOException 
 	 */
 	private void createAllocationContext(final String assemblyName,
-			final String containerName) {
+			final String containerName) throws IOException {
 		// get all AllocationContexts
 		final EList<AssemblyContext> assemblyContexts = creatorTools
 				.getThisSystem().getAssemblyContexts__ComposedStructure();

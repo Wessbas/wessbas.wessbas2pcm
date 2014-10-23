@@ -15,8 +15,10 @@ import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.Interface;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
+import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.OperationRequiredRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
+import de.uka.ipd.sdq.pcm.repository.ProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.Repository;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
 import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
@@ -164,9 +166,9 @@ public class SeffCreator {
 
 		// add externalCall to the system
 		// TODO: Create better solution for target component
-		ExternalCallAction externalCallAction = createExternalCallAction(
+		ExternalCallAction externalCallAction = createExternalCallActionSystem(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
-						.getTargetState().getEId(), "app");
+						.getTargetState().getEId());
 
 		if (externalCallAction != null) {
 			resourceDemandingBehaviour.getSteps_Behaviour().add(
@@ -174,7 +176,7 @@ public class SeffCreator {
 		}
 
 		// add next markov state, outgoingTransition
-		ExternalCallAction targetState = createExternalCallAction(
+		ExternalCallAction targetState = createExternalCallActionNext(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
 						.getTargetState().getEId(), behaviorModel.getName());
 
@@ -245,14 +247,14 @@ public class SeffCreator {
 					parametricResourceDemand
 							.setRequiredResource_ParametricResourceDemand(processingResourceType);
 
+					// TODO: Use Deviation
 					// if deviation is zero just set the mean resource demand
-					if (deviation == 0) {
-						pcmRandomVariable.setSpecification(Double
+					pcmRandomVariable.setSpecification(Double
 								.toString(resourceDemand));
-					} else {
-						pcmRandomVariable.setSpecification("Norm ("
-								+ resourceDemand + "," + deviation + ")");
-					}
+					
+//						pcmRandomVariable.setSpecification("Norm ("
+//								+ resourceDemand + "," + deviation + ")");
+					
 				}
 			}
 		}
@@ -266,10 +268,48 @@ public class SeffCreator {
 	 * 
 	 * @param bc
 	 * @param operationName
-	 * @param componentName
-	 * @return
+	 * @return ExternalCallAction
+	 * @throws IOException 
 	 */
-	private ExternalCallAction createExternalCallAction(
+	private ExternalCallAction createExternalCallActionSystem(
+			final BasicComponent bc, final String operationName) throws IOException {
+		ExternalCallAction externalAction = null;
+		final EList<ProvidedRole> providedRoles = creatorTools.getThisSystem()
+				.getProvidedRoles_InterfaceProvidingEntity();
+		for (final ProvidedRole providedRole : providedRoles) {
+			final OperationProvidedRole opr = (OperationProvidedRole) providedRole;
+			final OperationInterface oi = opr
+					.getProvidedInterface__OperationProvidedRole();				
+			final EList<OperationSignature> operationSignatures = oi
+					.getSignatures__OperationInterface();
+			for (OperationSignature operationSignature : operationSignatures) {
+				// TODO: similarity metric?
+				if (operationName.contains(operationSignature.getEntityName())) {
+					OperationRequiredRole opreq = createRequiredRoleBetweenComponents(
+							bc.getEntityName(),
+							oi.getEntityName(),
+							thisRepository);
+					externalAction = SeffFactory.eINSTANCE
+							.createExternalCallAction();
+					externalAction.setEntityName(operationName);
+					externalAction
+							.setCalledService_ExternalService(operationSignature);
+					externalAction.setRole_ExternalService(opreq);
+				}
+			}			
+		}		
+		return externalAction;
+	}
+	
+	/**
+	 * Create externalCallAction to the next behaviorStep.
+	 * 
+	 * @param bc
+	 * @param operationName
+	 * @param componentName
+	 * @return ExternalCallAction
+	 */
+	private ExternalCallAction createExternalCallActionNext(
 			final BasicComponent bc, final String operationName,
 			final String componentName) {
 		ExternalCallAction externalAction = null;
