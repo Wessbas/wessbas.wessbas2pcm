@@ -12,12 +12,17 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
+import de.uka.ipd.sdq.pcm.parameter.ParameterFactory;
+import de.uka.ipd.sdq.pcm.parameter.VariableCharacterisation;
+import de.uka.ipd.sdq.pcm.parameter.VariableCharacterisationType;
+import de.uka.ipd.sdq.pcm.parameter.VariableUsage;
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.Interface;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.OperationRequiredRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
+import de.uka.ipd.sdq.pcm.repository.Parameter;
 import de.uka.ipd.sdq.pcm.repository.ProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.Repository;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
@@ -37,10 +42,12 @@ import de.uka.ipd.sdq.pcm.seff.StartAction;
 import de.uka.ipd.sdq.pcm.seff.StopAction;
 import de.uka.ipd.sdq.pcm.seff.seff_performance.ParametricResourceDemand;
 import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
+import de.uka.ipd.sdq.stoex.StoexFactory;
+import de.uka.ipd.sdq.stoex.VariableReference;
 
 /**
- * This class is called from the RepositoryCreator class. 
- * It created seff based on the wmarkovStates of the workload model. 
+ * This class is called from the RepositoryCreator class. It created seff based
+ * on the wmarkovStates of the workload model.
  * 
  * @author voegele
  * 
@@ -77,8 +84,31 @@ public class SeffCreator {
 			seff.getSteps_Behaviour().add(stopAction);
 			BranchAction branchAction = createBranch(seff, behaviorModel);
 
+			// first markovState. In this case the first system action must be
+			// added as well.
+			ExternalCallAction firstExternalCallAction = null;
+			if (behaviorModel.getInitialState().getService().getName()
+					.equals(seff.getDescribedService__SEFF().getEntityName())) {
+				firstExternalCallAction = createExternalCallActionSystem(
+						seff.getBasicComponent_ServiceEffectSpecification(),
+						behaviorModel.getInitialState().getService().getName());
+			}
+
 			// connect new nodes
-			if (branchAction != null) {
+			if (firstExternalCallAction != null && branchAction != null) {
+				seff.getSteps_Behaviour().add(firstExternalCallAction);
+				seff.getSteps_Behaviour().add(branchAction);
+				startAction
+						.setSuccessor_AbstractAction(firstExternalCallAction);
+				firstExternalCallAction
+						.setPredecessor_AbstractAction(startAction);
+				firstExternalCallAction
+						.setSuccessor_AbstractAction(branchAction);
+				branchAction
+						.setPredecessor_AbstractAction(firstExternalCallAction);
+				branchAction.setSuccessor_AbstractAction(stopAction);
+				stopAction.setPredecessor_AbstractAction(branchAction);
+			} else if (branchAction != null) {
 				seff.getSteps_Behaviour().add(branchAction);
 				startAction.setSuccessor_AbstractAction(branchAction);
 				branchAction.setPredecessor_AbstractAction(startAction);
@@ -107,12 +137,11 @@ public class SeffCreator {
 			final BehaviorModel behaviorModel) throws IOException {
 		BranchAction branchAction = SeffFactory.eINSTANCE.createBranchAction();
 		for (MarkovState markovState : behaviorModel.getMarkovStates()) {
-
 			// identify markovState with seff name
 			if (markovState.getService().getName()
 					.equals(seff.getDescribedService__SEFF().getEntityName())) {
 
-				// for each toutgoing transition of the markovState, create a
+				// for each outgoing transition of the markovState, create a
 				// new probabilisticBranchTransition
 				for (Transition transition : markovState
 						.getOutgoingTransitions()) {
@@ -120,6 +149,7 @@ public class SeffCreator {
 							transition, seff, behaviorModel);
 					probabilisticBranchTransition
 							.setBranchAction_AbstractBranchTransition(branchAction);
+
 				}
 			}
 		}
@@ -133,13 +163,14 @@ public class SeffCreator {
 	 * @param transition
 	 * @param seff
 	 * @param behaviorModel
+	 * @param first
 	 * @return
 	 * @throws IOException
 	 */
 	private ProbabilisticBranchTransition createProbabilisticBranchTransition(
 			final Transition transition, final ResourceDemandingSEFF seff,
 			final BehaviorModel behaviorModel) throws IOException {
-		
+
 		ProbabilisticBranchTransition probabilisticBranchTransition = SeffFactory.eINSTANCE
 				.createProbabilisticBranchTransition();
 		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
@@ -151,21 +182,10 @@ public class SeffCreator {
 		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
 
 		// add thinkTime of transition as internal action with delay
-		InternalAction internalAction = SeffFactory.eINSTANCE
-				.createInternalAction();
-
-		final NormallyDistributedThinkTime normallyDistributedThinkTime = (NormallyDistributedThinkTime) transition
-				.getThinkTime();
-
-		internalAction.getResourceDemand_Action().add(
-				getParametricResourceDemand(thisResourceSet, "DELAY",
-						normallyDistributedThinkTime.getMean(),
-						normallyDistributedThinkTime.getDeviation()));
-
+		InternalAction internalAction = createInternalAction(transition);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(internalAction);
 
 		// add externalCall to the system
-		// TODO: Create better solution for target component
 		ExternalCallAction externalCallAction = createExternalCallActionSystem(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
 						.getTargetState().getEId());
@@ -250,11 +270,11 @@ public class SeffCreator {
 					// TODO: Use Deviation
 					// if deviation is zero just set the mean resource demand
 					pcmRandomVariable.setSpecification(Double
-								.toString(resourceDemand));
-					
-//						pcmRandomVariable.setSpecification("Norm ("
-//								+ resourceDemand + "," + deviation + ")");
-					
+							.toString(resourceDemand));
+
+					// pcmRandomVariable.setSpecification("Norm ("
+					// + resourceDemand + "," + deviation + ")");
+
 				}
 			}
 		}
@@ -264,43 +284,95 @@ public class SeffCreator {
 	}
 
 	/**
+	 * @param transition
+	 * @return InternalAction
+	 * @throws IOException
+	 */
+	private InternalAction createInternalAction(final Transition transition)
+			throws IOException {
+		InternalAction internalAction = SeffFactory.eINSTANCE
+				.createInternalAction();
+		final NormallyDistributedThinkTime normallyDistributedThinkTime = (NormallyDistributedThinkTime) transition
+				.getThinkTime();
+		internalAction.getResourceDemand_Action().add(
+				getParametricResourceDemand(thisResourceSet, "DELAY",
+						normallyDistributedThinkTime.getMean(),
+						normallyDistributedThinkTime.getDeviation()));
+		return internalAction;
+	}
+
+	/**
 	 * Create externalCallAction to the system.
 	 * 
 	 * @param bc
 	 * @param operationName
 	 * @return ExternalCallAction
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private ExternalCallAction createExternalCallActionSystem(
-			final BasicComponent bc, final String operationName) throws IOException {
+			final BasicComponent bc, final String operationName)
+			throws IOException {
 		ExternalCallAction externalAction = null;
 		final EList<ProvidedRole> providedRoles = creatorTools.getThisSystem()
 				.getProvidedRoles_InterfaceProvidingEntity();
 		for (final ProvidedRole providedRole : providedRoles) {
 			final OperationProvidedRole opr = (OperationProvidedRole) providedRole;
 			final OperationInterface oi = opr
-					.getProvidedInterface__OperationProvidedRole();				
+					.getProvidedInterface__OperationProvidedRole();
 			final EList<OperationSignature> operationSignatures = oi
 					.getSignatures__OperationInterface();
 			for (OperationSignature operationSignature : operationSignatures) {
-				// TODO: similarity metric?
-				if (operationName.contains(operationSignature.getEntityName())) {
+				if (operationName.toLowerCase().contains(
+						operationSignature.getEntityName().toLowerCase())) {
 					OperationRequiredRole opreq = createRequiredRoleBetweenComponents(
-							bc.getEntityName(),
-							oi.getEntityName(),
+							bc.getEntityName(), oi.getEntityName(),
 							thisRepository);
 					externalAction = SeffFactory.eINSTANCE
 							.createExternalCallAction();
 					externalAction.setEntityName(operationName);
 					externalAction
 							.setCalledService_ExternalService(operationSignature);
+					EList<Parameter> parameterList = operationSignature
+							.getParameters__OperationSignature();
+					VariableUsage variableUsage = createVariableUsage(
+							parameterList.get(0).getParameterName(),
+							"\"" + oi.getEntityName() + "_"
+									+ operationSignature.getEntityName() + "\"");
+					externalAction.getInputVariableUsages__CallAction().add(
+							variableUsage);
 					externalAction.setRole_ExternalService(opreq);
 				}
-			}			
-		}		
+			}
+		}
 		return externalAction;
 	}
-	
+
+	/**
+	 * create a VariableUsage defining a value for a parameter
+	 * 
+	 * @param parameterName
+	 *            the name of the parameter
+	 * @param value
+	 *            the value to set
+	 * @return the VariableUsage created
+	 */
+	public VariableUsage createVariableUsage(String parameterName, String value) {
+		VariableUsage usage = ParameterFactory.eINSTANCE.createVariableUsage();
+		VariableCharacterisation characterisation = ParameterFactory.eINSTANCE
+				.createVariableCharacterisation();
+		PCMRandomVariable PCMVariable = CoreFactory.eINSTANCE
+				.createPCMRandomVariable();
+		PCMVariable.setSpecification(value);
+		characterisation.setSpecification_VariableCharacterisation(PCMVariable);
+		characterisation.setType(VariableCharacterisationType.VALUE);
+		usage.getVariableCharacterisation_VariableUsage().add(characterisation);
+		VariableReference reference = StoexFactory.eINSTANCE
+				.createVariableReference();
+		reference.setReferenceName(parameterName);
+		usage.setNamedReference__VariableUsage(reference);
+		return usage;
+	}
+
 	/**
 	 * Create externalCallAction to the next behaviorStep.
 	 * 
@@ -316,7 +388,6 @@ public class SeffCreator {
 		EList<Interface> interfaceList = thisRepository
 				.getInterfaces__Repository();
 		for (Interface interfaceInstance : interfaceList) {
-			// TODO: remove and a general solution.
 			if (interfaceInstance.getEntityName().equals(componentName)) {
 				OperationInterface oi = (OperationInterface) interfaceInstance;
 				EList<OperationSignature> operationSignatureList = oi

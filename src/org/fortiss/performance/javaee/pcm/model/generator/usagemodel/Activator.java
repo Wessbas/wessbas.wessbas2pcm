@@ -40,7 +40,7 @@ public class Activator extends AbstractUIPlugin {
 
 		// create new component in repository
 		RepositoryCreator repositoryCreator = new RepositoryCreator();
-		repositoryCreator.createWorkflowComponent();
+		repositoryCreator.createBehaviorModelComponents();
 
 		// create new assembly in system
 		SystemCreator systemCreator = new SystemCreator();

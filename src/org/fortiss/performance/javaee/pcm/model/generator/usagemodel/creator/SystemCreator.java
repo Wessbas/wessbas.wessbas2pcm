@@ -37,9 +37,7 @@ public class SystemCreator {
 	/**
 	 * updates System Model.
 	 */
-	public final void updateSystem() {
-
-		
+	public final void updateSystem() {	
 
 		try {
 

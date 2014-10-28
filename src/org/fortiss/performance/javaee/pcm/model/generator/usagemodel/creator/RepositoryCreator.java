@@ -1,10 +1,13 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
+
 import m4jdsl.BehaviorModel;
 import m4jdsl.MarkovState;
+
 import org.eclipse.emf.common.util.EList;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
+
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
@@ -32,17 +35,17 @@ public class RepositoryCreator {
 	 * 
 	 * @param resourceSet
 	 * @param workloadModel
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public final void createWorkflowComponent() throws IOException {
+	public final void createBehaviorModelComponents() throws IOException {
 		creatorTools.log.info("- CREATE WORKLOAD SPECIFICATION COMPONENTS");
 
 		// check if repository exists, if yes load it
-		if (Configuration.getRepositoryFile().exists()) {			
+		if (Configuration.getRepositoryFile().exists()) {
 
 			// get behaviorModels of the workloadModel
-			EList<BehaviorModel> behaviorModelList = creatorTools.getThisWorkloadModel()
-					.getBehaviorModels();
+			EList<BehaviorModel> behaviorModelList = creatorTools
+					.getThisWorkloadModel().getBehaviorModels();
 
 			// create a new component per behaviorModel
 			for (BehaviorModel behaviorModel : behaviorModelList) {
@@ -59,9 +62,10 @@ public class RepositoryCreator {
 	 * Create new behaviorModel component.
 	 * 
 	 * @param behaviorModel
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private void createBehaviorModelComponent(final BehaviorModel behaviorModel) throws IOException {
+	private void createBehaviorModelComponent(final BehaviorModel behaviorModel)
+			throws IOException {
 		BasicComponent bc = null;
 		OperationInterface myInterface = null;
 
@@ -168,10 +172,11 @@ public class RepositoryCreator {
 	 * @param operationSignature
 	 * @param bc
 	 * @param behaviorModel
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void seffInitializer(final OperationSignature operationSignature,
-			final BasicComponent bc, final BehaviorModel behaviorModel) throws IOException {
+			final BasicComponent bc, final BehaviorModel behaviorModel)
+			throws IOException {
 		// create SEFF
 		ResourceDemandingSEFF seff = SeffFactory.eINSTANCE
 				.createResourceDemandingSEFF();
