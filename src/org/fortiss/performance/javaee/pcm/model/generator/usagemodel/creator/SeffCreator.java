@@ -321,9 +321,28 @@ public class SeffCreator {
 					.getProvidedInterface__OperationProvidedRole();
 			final EList<OperationSignature> operationSignatures = oi
 					.getSignatures__OperationInterface();
+
+			// calculate levenshteinDistance;
+			// double levenshteinDistanceResult = 0;
+			// double levenshteinDistanceMax = 0;
+			// String bestMatchingOperationSignature = "";
+			// for (OperationSignature operationSignature : operationSignatures)
+			// {
+			// levenshteinDistanceResult = creatorTools.levenshteinDistance(
+			// operationName, operationSignature.getEntityName());
+			// if (levenshteinDistanceResult > levenshteinDistanceMax) {
+			// levenshteinDistanceMax = levenshteinDistanceResult;
+			// bestMatchingOperationSignature = operationSignature
+			// .getEntityName();
+			// }
+			// }
+
+			int indexOfChar = operationName.indexOf("_", 1);
+			String newOperationName = operationName.substring(indexOfChar + 1,
+					operationName.length());
 			for (OperationSignature operationSignature : operationSignatures) {
-				if (operationName.toLowerCase().contains(
-						operationSignature.getEntityName().toLowerCase())) {
+				if (operationSignature.getEntityName().startsWith(
+						newOperationName)) {
 					OperationRequiredRole opreq = createRequiredRoleBetweenComponents(
 							bc.getEntityName(), oi.getEntityName(),
 							thisRepository);
