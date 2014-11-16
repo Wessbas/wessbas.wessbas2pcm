@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<usagemodel:UsageModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:usagemodel="http://sdq.ipd.uka.de/PalladioComponentModel/UsageModel/5.0">
+  <usageScenario_UsageModel id="_LFQOEF7CEeSL24Y17oAvQw" entityName="GeneratedUsageScenario">
+    <scenarioBehaviour_UsageScenario id="_LFQ1IF7CEeSL24Y17oAvQw" entityName="DefaultScenario">
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_LFRcMF7CEeSL24Y17oAvQw" successor="_LFSDQV7CEeSL24Y17oAvQw"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_LFSDQF7CEeSL24Y17oAvQw" predecessor="_LFSDQV7CEeSL24Y17oAvQw"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Branch" id="_LFSDQV7CEeSL24Y17oAvQw" entityName="BehaviorMix" successor="_LFSDQF7CEeSL24Y17oAvQw" predecessor="_LFRcMF7CEeSL24Y17oAvQw">
+        <branchTransitions_Branch branchProbability="0.0103">
+          <branchedBehaviour_BranchTransition id="_LFSqUF7CEeSL24Y17oAvQw">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_LFSqUV7CEeSL24Y17oAvQw" successor="_LFTRYV7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_LFSqUl7CEeSL24Y17oAvQw" predecessor="_LFTRYV7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_LFTRYV7CEeSL24Y17oAvQw" entityName="login" successor="_LFSqUl7CEeSL24Y17oAvQw" predecessor="_LFSqUV7CEeSL24Y17oAvQw">
+              <providedRole_EntryLevelSystemCall href="test.system#_LD90oV7CEeSL24Y17oAvQw"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_LBLmZl7CEeSL24Y17oAvQw"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch branchProbability="0.2385">
+          <branchedBehaviour_BranchTransition id="_LFTRYl7CEeSL24Y17oAvQw">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_LFTRY17CEeSL24Y17oAvQw" successor="_LFTRZl7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_LFTRZF7CEeSL24Y17oAvQw" predecessor="_LFTRZl7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_LFTRZl7CEeSL24Y17oAvQw" entityName="login" successor="_LFTRZF7CEeSL24Y17oAvQw" predecessor="_LFTRY17CEeSL24Y17oAvQw">
+              <providedRole_EntryLevelSystemCall href="test.system#_LD90pF7CEeSL24Y17oAvQw"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_LCAs5V7CEeSL24Y17oAvQw"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch branchProbability="0.2462">
+          <branchedBehaviour_BranchTransition id="_LFTRZ17CEeSL24Y17oAvQw">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_LFTRaF7CEeSL24Y17oAvQw" successor="_LFTRa17CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_LFTRaV7CEeSL24Y17oAvQw" predecessor="_LFTRa17CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_LFTRa17CEeSL24Y17oAvQw" entityName="login" successor="_LFTRaV7CEeSL24Y17oAvQw" predecessor="_LFTRaF7CEeSL24Y17oAvQw">
+              <providedRole_EntryLevelSystemCall href="test.system#_LD90p17CEeSL24Y17oAvQw"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_LCEXO17CEeSL24Y17oAvQw"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch branchProbability="0.505">
+          <branchedBehaviour_BranchTransition id="_LFTRbF7CEeSL24Y17oAvQw">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_LFTRbV7CEeSL24Y17oAvQw" successor="_LFTRcF7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_LFTRbl7CEeSL24Y17oAvQw" predecessor="_LFTRcF7CEeSL24Y17oAvQw"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_LFTRcF7CEeSL24Y17oAvQw" entityName="login" successor="_LFTRbl7CEeSL24Y17oAvQw" predecessor="_LFTRbV7CEeSL24Y17oAvQw">
+              <providedRole_EntryLevelSystemCall href="test.system#_LD90ql7CEeSL24Y17oAvQw"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_LCP9bF7CEeSL24Y17oAvQw"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+      </actions_ScenarioBehaviour>
+    </scenarioBehaviour_UsageScenario>
+    <workload_UsageScenario xsi:type="usagemodel:ClosedWorkload" population="250">
+      <thinkTime_ClosedWorkload specification="2.5"/>
+    </workload_UsageScenario>
+  </usageScenario_UsageModel>
+</usagemodel:UsageModel>

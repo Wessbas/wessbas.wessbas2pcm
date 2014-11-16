@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<usagemodel:UsageModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:usagemodel="http://sdq.ipd.uka.de/PalladioComponentModel/UsageModel/5.0">
+  <usageScenario_UsageModel id="_BOz0wF6_EeSNrrYSizK9aQ" entityName="GeneratedUsageScenario">
+    <scenarioBehaviour_UsageScenario id="_BOz0wV6_EeSNrrYSizK9aQ" entityName="DefaultScenario">
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_BOz0wl6_EeSNrrYSizK9aQ" successor="_BOz0xF6_EeSNrrYSizK9aQ"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_BOz0w16_EeSNrrYSizK9aQ" predecessor="_BOz0xF6_EeSNrrYSizK9aQ"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Branch" id="_BOz0xF6_EeSNrrYSizK9aQ" entityName="BehaviorMix" successor="_BOz0w16_EeSNrrYSizK9aQ" predecessor="_BOz0wl6_EeSNrrYSizK9aQ">
+        <branchTransitions_Branch branchProbability="0.495">
+          <branchedBehaviour_BranchTransition id="_BOz0xV6_EeSNrrYSizK9aQ">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_BOz0xl6_EeSNrrYSizK9aQ" successor="_BOz0yV6_EeSNrrYSizK9aQ"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_BOz0x16_EeSNrrYSizK9aQ" predecessor="_BOz0yV6_EeSNrrYSizK9aQ"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_BOz0yV6_EeSNrrYSizK9aQ" entityName="login" successor="_BOz0x16_EeSNrrYSizK9aQ" predecessor="_BOz0xl6_EeSNrrYSizK9aQ">
+              <providedRole_EntryLevelSystemCall href="test.system#_BOEN4V6_EeSNrrYSizK9aQ"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_BMkZGl6_EeSNrrYSizK9aQ"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch branchProbability="0.505">
+          <branchedBehaviour_BranchTransition id="_BOz0yl6_EeSNrrYSizK9aQ">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_BOz0y16_EeSNrrYSizK9aQ" successor="_BOz0zl6_EeSNrrYSizK9aQ"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_BOz0zF6_EeSNrrYSizK9aQ" predecessor="_BOz0zl6_EeSNrrYSizK9aQ"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_BOz0zl6_EeSNrrYSizK9aQ" entityName="login" successor="_BOz0zF6_EeSNrrYSizK9aQ" predecessor="_BOz0y16_EeSNrrYSizK9aQ">
+              <providedRole_EntryLevelSystemCall href="test.system#_BOEN5F6_EeSNrrYSizK9aQ"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_BM37wV6_EeSNrrYSizK9aQ"/>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+      </actions_ScenarioBehaviour>
+    </scenarioBehaviour_UsageScenario>
+    <workload_UsageScenario xsi:type="usagemodel:ClosedWorkload" population="250">
+      <thinkTime_ClosedWorkload specification="2.4"/>
+    </workload_UsageScenario>
+  </usageScenario_UsageModel>
+</usagemodel:UsageModel>

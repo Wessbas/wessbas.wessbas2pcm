@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<allocation:Allocation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:allocation="http://sdq.ipd.uka.de/PalladioComponentModel/Allocation/5.0" id="_5jFFQEFzEeOHVZnxmOkBKw">
+  <targetResourceEnvironment_Allocation href="test.resourceenvironment#/"/>
+  <system_Allocation href="test.system#_5i7UQEFzEeOHVZnxmOkBKw"/>
+  <allocationContexts_Allocation id="_5jFsUEFzEeOHVZnxmOkBKw" entityName="OrderSession">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77UEFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsUUFzEeOHVZnxmOkBKw" entityName="_welcome_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77UUFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsUkFzEeOHVZnxmOkBKw" entityName="_error_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77UkFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsU0FzEeOHVZnxmOkBKw" entityName="ItemBrowserSession">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77U0FzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsVEFzEeOHVZnxmOkBKw" entityName="_shoppingcart_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77VEFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsVUFzEeOHVZnxmOkBKw" entityName="_order_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77VUFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsVkFzEeOHVZnxmOkBKw" entityName="_purchase_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77VkFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsV0FzEeOHVZnxmOkBKw" entityName="_SpecJhome_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77V0FzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsWEFzEeOHVZnxmOkBKw" entityName="_dealerinventory_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77WEFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jFsWUFzEeOHVZnxmOkBKw" entityName="CustomerSession">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77WUFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jGTYEFzEeOHVZnxmOkBKw" entityName="_app">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77WkFzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_5jGTYUFzEeOHVZnxmOkBKw" entityName="_cachetest_jsp">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_5i77W0FzEeOHVZnxmOkBKw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_IIgJEF7CEeS-afsbA33iSQ" entityName="Assembly_gen_behavior_model0 &lt;gen_behavior_model0>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_IG_tMF7CEeS-afsbA33iSQ"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_IIgJEV7CEeS-afsbA33iSQ" entityName="Assembly_gen_behavior_model1 &lt;gen_behavior_model1>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_IHAUQV7CEeS-afsbA33iSQ"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_IIgJEl7CEeS-afsbA33iSQ" entityName="Assembly_gen_behavior_model2 &lt;gen_behavior_model2>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_5ZgSgEFzEeOHVZnxmOkBKw"/>
+    <assemblyContext_AllocationContext href="test.system#_IHAURF7CEeS-afsbA33iSQ"/>
+  </allocationContexts_Allocation>
+</allocation:Allocation>
