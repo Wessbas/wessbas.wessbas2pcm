@@ -7,6 +7,8 @@ import m4jdsl.BehaviorModel;
 import m4jdsl.RelativeFrequency;
 
 import org.eclipse.emf.common.util.EList;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
+
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
@@ -147,8 +149,7 @@ public class UsagemodelCreator {
 
 				for (OperationSignature operationSignature : operationSignatures) {
 
-					if (behaviorModel.getInitialState().getService().getName()
-							.equals(operationSignature.getEntityName())) {
+					if (operationSignature.getEntityName().equals(Constants.INITIAL_NAME)) {
 						entryLevelSystemCall = UsagemodelFactory.eINSTANCE
 								.createEntryLevelSystemCall();
 						entryLevelSystemCall.setEntityName(behaviorModel

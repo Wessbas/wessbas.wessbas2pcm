@@ -7,6 +7,7 @@ import m4jdsl.MarkovState;
 
 import org.eclipse.emf.common.util.EList;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
@@ -111,14 +112,21 @@ public class RepositoryCreator {
 
 		// create a operationSignature for each markovState having outgoing
 		// transitions in the behaviorModel
-		for (MarkovState markovState : behaviorModel.getMarkovStates()) {
-			if (markovState.getOutgoingTransitions().size() > 0) {
-				createOperationSignature(markovState.getService().getName(),
+		for (MarkovState markovState : behaviorModel.getMarkovStates()) {		
+			if (markovState.getOutgoingTransitions().size() > 0) {				
+				if (markovState.equals(behaviorModel.getInitialState())) {
+					createOperationSignature(Constants.INITIAL_NAME,
+							myInterface);
+					createOperationSignature(markovState.getService().getName(),
+							myInterface);					
+				} else {
+					createOperationSignature(markovState.getService().getName(),
 						myInterface);
+				}
 			}
 		}
 
-		// create a new seff for the new operationSignature of the
+		// create a new seff for the new operationSignatures of the
 		// behaviorModelComponent
 		EList<OperationSignature> operationSignatures = myInterface
 				.getSignatures__OperationInterface();

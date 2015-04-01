@@ -9,6 +9,7 @@ import m4jdsl.Transition;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
@@ -81,33 +82,40 @@ public class SeffCreator {
 			StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
 			seff.getSteps_Behaviour().add(startAction);
 			StopAction stopAction = SeffFactory.eINSTANCE.createStopAction();
-			seff.getSteps_Behaviour().add(stopAction);
-			BranchAction branchAction = createBranch(seff, behaviorModel);
+			seff.getSteps_Behaviour().add(stopAction);			
 
-			// first markovState. In this case the first system action must be
-			// added as well.
 			ExternalCallAction firstExternalCallAction = null;
-			if (behaviorModel.getInitialState().getService().getName()
-					.equals(seff.getDescribedService__SEFF().getEntityName())) {
+			ExternalCallAction nextExternalCallAction = null;
+			BranchAction branchAction = null;
+			
+			
+			// check initial state
+			if (seff.getDescribedService__SEFF().getEntityName().equals(Constants.INITIAL_NAME)) {
 				firstExternalCallAction = createExternalCallActionSystem(
 						seff.getBasicComponent_ServiceEffectSpecification(),
 						behaviorModel.getInitialState().getService().getName());
-			}
+				nextExternalCallAction = createExternalCallActionNext(
+						seff.getBasicComponent_ServiceEffectSpecification(), 
+						behaviorModel.getInitialState().getService().getName(),
+						behaviorModel.getName());
+			} else {			
+				branchAction = createBranch(seff, behaviorModel);
+			}	
 
 			// connect new nodes
-			if (firstExternalCallAction != null && branchAction != null) {
+			if (firstExternalCallAction != null && nextExternalCallAction != null) {
 				seff.getSteps_Behaviour().add(firstExternalCallAction);
-				seff.getSteps_Behaviour().add(branchAction);
+				seff.getSteps_Behaviour().add(nextExternalCallAction);
 				startAction
 						.setSuccessor_AbstractAction(firstExternalCallAction);
 				firstExternalCallAction
 						.setPredecessor_AbstractAction(startAction);
 				firstExternalCallAction
-						.setSuccessor_AbstractAction(branchAction);
-				branchAction
+						.setSuccessor_AbstractAction(nextExternalCallAction);
+				nextExternalCallAction
 						.setPredecessor_AbstractAction(firstExternalCallAction);
-				branchAction.setSuccessor_AbstractAction(stopAction);
-				stopAction.setPredecessor_AbstractAction(branchAction);
+				nextExternalCallAction.setSuccessor_AbstractAction(stopAction);
+				stopAction.setPredecessor_AbstractAction(nextExternalCallAction);
 			} else if (branchAction != null) {
 				seff.getSteps_Behaviour().add(branchAction);
 				startAction.setSuccessor_AbstractAction(branchAction);
@@ -321,21 +329,6 @@ public class SeffCreator {
 					.getProvidedInterface__OperationProvidedRole();
 			final EList<OperationSignature> operationSignatures = oi
 					.getSignatures__OperationInterface();
-
-			// calculate levenshteinDistance;
-			// double levenshteinDistanceResult = 0;
-			// double levenshteinDistanceMax = 0;
-			// String bestMatchingOperationSignature = "";
-			// for (OperationSignature operationSignature : operationSignatures)
-			// {
-			// levenshteinDistanceResult = creatorTools.levenshteinDistance(
-			// operationName, operationSignature.getEntityName());
-			// if (levenshteinDistanceResult > levenshteinDistanceMax) {
-			// levenshteinDistanceMax = levenshteinDistanceResult;
-			// bestMatchingOperationSignature = operationSignature
-			// .getEntityName();
-			// }
-			// }
 
 			int indexOfChar = operationName.indexOf("_", 1);
 			String newOperationName = operationName.substring(indexOfChar + 1,
