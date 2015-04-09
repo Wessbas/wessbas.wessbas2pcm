@@ -12,6 +12,6 @@ public class Constants {
 	public static final String INPUT_FILE_DELIMITER_PARAMETERPAIR = "/";
 	public static final String INPUT_FILE_DELIMITER_PARAMETER = "=";
 	public static final String BEHAVIORMODELCONTAINER = "aName";
-	public static final String XMI_FILE = "./workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/input/workloadmodel_2.xmi";
+	public static final String XMI_FILE = "./workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/input/workloadmodel_test.xmi";
 	public static final String INITIAL_NAME = "INITIAL"; 
 }

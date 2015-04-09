@@ -1,10 +1,20 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
+import m4jdsl.Action;
+import m4jdsl.ApplicationState;
+import m4jdsl.ApplicationTransition;
 import m4jdsl.BehaviorModel;
+import m4jdsl.Guard;
+import m4jdsl.GuardActionParameterType;
 import m4jdsl.MarkovState;
 import m4jdsl.NormallyDistributedThinkTime;
+import m4jdsl.SessionLayerEFSM;
 import m4jdsl.Transition;
 
 import org.eclipse.emf.common.util.EList;
@@ -34,6 +44,7 @@ import de.uka.ipd.sdq.pcm.resourcetype.ResourceRepository;
 import de.uka.ipd.sdq.pcm.resourcetype.ResourceType;
 import de.uka.ipd.sdq.pcm.seff.BranchAction;
 import de.uka.ipd.sdq.pcm.seff.ExternalCallAction;
+import de.uka.ipd.sdq.pcm.seff.GuardedBranchTransition;
 import de.uka.ipd.sdq.pcm.seff.InternalAction;
 import de.uka.ipd.sdq.pcm.seff.ProbabilisticBranchTransition;
 import de.uka.ipd.sdq.pcm.seff.ResourceDemandingBehaviour;
@@ -97,9 +108,9 @@ public class SeffCreator {
 				nextExternalCallAction = createExternalCallActionNext(
 						seff.getBasicComponent_ServiceEffectSpecification(), 
 						behaviorModel.getInitialState().getService().getName(),
-						behaviorModel.getName());
+						behaviorModel.getName(), null);
 			} else {			
-				branchAction = createBranch(seff, behaviorModel);
+				branchAction = createGuardedBranchAction(seff, behaviorModel);
 			}	
 
 			// connect new nodes
@@ -141,24 +152,261 @@ public class SeffCreator {
 	 * @return BranchAction
 	 * @throws IOException
 	 */
-	private BranchAction createBranch(final ResourceDemandingSEFF seff,
+	private BranchAction createGuardedBranchAction(final ResourceDemandingSEFF seff,
 			final BehaviorModel behaviorModel) throws IOException {
 		BranchAction branchAction = SeffFactory.eINSTANCE.createBranchAction();
 		for (MarkovState markovState : behaviorModel.getMarkovStates()) {
 			// identify markovState with seff name
 			if (markovState.getService().getName()
-					.equals(seff.getDescribedService__SEFF().getEntityName())) {
-
-				// for each outgoing transition of the markovState, create a
-				// new probabilisticBranchTransition
-				for (Transition transition : markovState
-						.getOutgoingTransitions()) {
-					ProbabilisticBranchTransition probabilisticBranchTransition = createProbabilisticBranchTransition(
-							transition, seff, behaviorModel);
-					probabilisticBranchTransition
-							.setBranchAction_AbstractBranchTransition(branchAction);
-
-				}
+					.equals(seff.getDescribedService__SEFF().getEntityName())) {	
+				
+				// getActions of markovState
+				LinkedHashMap<Transition, EList<Action>> actions = getActions(seff, behaviorModel, markovState);
+				
+				if (markovState
+						.getOutgoingTransitions().size() > 1) {
+					
+					// get guards of markovState 
+					LinkedHashMap<Transition, EList<Guard>> guards = getGuards(seff, behaviorModel, markovState);					
+							
+					// get all combinations of guards except the combination all are false
+					HashMap<String, List<GuardedTransition>> guardCombinations = getCombinations(guards, actions);
+					
+					// for each combination create a new guarded transition 
+					for (String combination : guardCombinations.keySet()) {	
+						List<GuardedTransition> guardedTransitions = guardCombinations.get(combination);
+						GuardedBranchTransition guardedBranchTransition = createGuardedBranchTransition(markovState, behaviorModel, guardedTransitions, seff, combination);		
+						guardedBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
+					}						
+					
+				// in this case are no guards needed	
+				} else {							
+					for (Transition transition : markovState
+							.getOutgoingTransitions()) {													
+						// for each outgoing transition of the markovState, create a
+						// new probabilisticBranchTransition
+						ProbabilisticBranchTransition probabilisticBranchTransition = createProbabilisticBranchTransition(
+								transition, seff, behaviorModel, 1.00, actions.get(transition));
+						probabilisticBranchTransition
+								.setBranchAction_AbstractBranchTransition(branchAction);							
+					}						
+				}				
+			}
+		}
+		return branchAction;
+	}	
+	
+	/**
+	 * Get the strings for the guardedTransitions.
+	 * 
+	 * @param guardedTransitions
+	 * @return String
+	 */
+	private String getGuardString(final List<GuardedTransition> guardedTransitions) {
+		String guardString = "";		
+		for (int i = 0; i < guardedTransitions.size() ; i++) {
+			if (!guardedTransitions.get(i).guardIsTrue) {
+				guardString = guardString + " NOT ";
+			}			
+			guardString = guardString + " ( ";			
+			for (int s = 0; s < guardedTransitions.get(i).getGuards().size() ; s++) {						
+				if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {					
+					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true ";					
+				} else if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.INTEGER) {					
+					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE > 0 ";					
+				}				
+				if (s != guardedTransitions.get(i).getGuards().size() -1) {
+					guardString = guardString + " AND ";
+				}				
+			}			
+			guardString = guardString + " ) ";			
+			if (i != guardedTransitions.size() -1) {
+				guardString = guardString + " AND ";
+			}
+		}			
+		return guardString;
+	}
+	
+	/**
+	 * @param guards
+	 * @return HashMap<String, List<GuardedTransition>>
+	 */
+	private HashMap<String, List<GuardedTransition>> getCombinations(final LinkedHashMap<Transition, EList<Guard>> guards, final LinkedHashMap<Transition, EList<Action>> actions) {
+		double size = (double) guards.size();
+		double numberOfCombinations = Math.pow(2, size);
+		HashMap<String, List<GuardedTransition>> guardCombinations = new HashMap<String, List<GuardedTransition>>();
+		for (int i = 1; i < numberOfCombinations; i++) {
+			String binaryString = addMissingZeros(Integer.toBinaryString(i), (int) size);
+			List<GuardedTransition> guardedTransitionList = new ArrayList<GuardedTransition>();
+			int s = 0;
+			for (Transition transition : guards.keySet()) {
+				s++;
+				GuardedTransition guardedTransition = new GuardedTransition(transition, guards.get(transition), actions.get(transition), transitionIsTrue(s, binaryString));
+				guardedTransitionList.add(guardedTransition);
+			}
+			guardCombinations.put(binaryString, guardedTransitionList);
+		}	
+		return guardCombinations;
+	}	
+	
+	/**
+	 * @param binaryString
+	 * @param size
+	 * @return String
+	 */
+	private String addMissingZeros(final String binaryString, final int size) {
+		String newBinaryString = binaryString;
+		if (binaryString.length() < size) {
+			int diff = size - binaryString.length();
+			for (int i = 0; i < diff; i++) {
+				newBinaryString = "0" + newBinaryString;
+			}
+		}
+		return newBinaryString;
+	}
+	
+	/**
+	 * Returns if the transition is true at the position i of the binaryString. 
+	 * 
+	 * @param i
+	 * @param binaryString
+	 * @return boolean
+	 */
+	private boolean transitionIsTrue(final int i, final String binaryString) {
+		if (i <= binaryString.length() && binaryString.substring(i-1, i).equals("1")) {
+			return true;
+		}		
+		return false;
+	}
+	
+	/**
+	 * Get guards of the transitions of the markovState. 
+	 * 
+	 * @param seff
+	 * @param behaviorModel
+	 * @return HashMap<Transition, EList<Guard>> with the guards of each transitions
+	 */
+	private LinkedHashMap<Transition, EList<Guard>> getGuards(final ResourceDemandingSEFF seff, final BehaviorModel behaviorModel, final MarkovState markovState) {
+		LinkedHashMap<Transition, EList<Guard>> guards = new LinkedHashMap<Transition, EList<Guard>>();		
+		for (Transition transition : markovState
+				.getOutgoingTransitions()) {					
+			if (transition.getTargetState() instanceof MarkovState) {
+				String sourceTransitionState = markovState.getService().toString();
+				String targetTransitionState = ((MarkovState) transition.getTargetState()).getService().toString();					
+				SessionLayerEFSM sessionLayerEFSM  = CreatorTools.getInstance().getThisWorkloadModel()
+						.getApplicationModel().getSessionLayerEFSM();					
+				for (ApplicationState applicationState : sessionLayerEFSM.getApplicationStates()) {
+					if (applicationState.getService().toString().equals(sourceTransitionState)) {
+						for (ApplicationTransition applicationTransition : applicationState.getOutgoingTransitions()) {
+							if (applicationTransition.getTargetState() instanceof ApplicationState) {
+								String targetApplicationState =  ((ApplicationState) applicationTransition.getTargetState()).getService().toString();
+			    				if (targetTransitionState.equals(targetApplicationState)) {
+			    					guards.put(transition, applicationTransition.getGuard());
+			    				}
+							}									
+						}
+					}
+				}		
+			}
+		}
+		return guards;
+	}		
+	
+	/**
+	 * Get actions of the transitions of the markovState. 
+	 * 
+	 * @param seff
+	 * @param behaviorModel
+	 * @return HashMap<Transition, EList<Guard>> with the guards of each transitions
+	 */
+	private LinkedHashMap<Transition, EList<Action>> getActions(final ResourceDemandingSEFF seff, final BehaviorModel behaviorModel, final MarkovState markovState) {
+		LinkedHashMap<Transition, EList<Action>> actions = new LinkedHashMap<Transition, EList<Action>>();		
+		for (Transition transition : markovState
+				.getOutgoingTransitions()) {					
+			if (transition.getTargetState() instanceof MarkovState) {
+				String sourceTransitionState = markovState.getService().toString();
+				String targetTransitionState = ((MarkovState) transition.getTargetState()).getService().toString();					
+				SessionLayerEFSM sessionLayerEFSM  = CreatorTools.getInstance().getThisWorkloadModel()
+						.getApplicationModel().getSessionLayerEFSM();					
+				for (ApplicationState applicationState : sessionLayerEFSM.getApplicationStates()) {
+					if (applicationState.getService().toString().equals(sourceTransitionState)) {
+						for (ApplicationTransition applicationTransition : applicationState.getOutgoingTransitions()) {
+							if (applicationTransition.getTargetState() instanceof ApplicationState) {
+								String targetApplicationState =  ((ApplicationState) applicationTransition.getTargetState()).getService().toString();
+			    				if (targetTransitionState.equals(targetApplicationState)) {
+			    					actions.put(transition, applicationTransition.getAction());
+			    				}
+							}									
+						}
+					}
+				}		
+			}
+		}
+		return actions;
+	}
+	
+	/**
+	 * Create guarded branch transition. 
+	 * 
+	 * @param transition
+	 * @param seff
+	 * @param behaviorModel
+	 * @return GuardedBranchTransition
+	 * @throws IOException 
+	 */
+	private GuardedBranchTransition createGuardedBranchTransition(
+			final MarkovState markovState, 
+			final BehaviorModel behaviorModel,
+			final List<GuardedTransition> guardedTransitions,
+			final ResourceDemandingSEFF seff,
+			final String guardName) throws IOException {
+		GuardedBranchTransition guardedBranchTransition = SeffFactory.eINSTANCE.createGuardedBranchTransition();
+		guardedBranchTransition.setBranchCondition_GuardedBranchTransition(createPCMRandomVariable(getGuardString(guardedTransitions)));
+		guardedBranchTransition.setEntityName(guardName);
+		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
+				.createResourceDemandingBehaviour();
+		StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
+		StopAction stopAction = SeffFactory.eINSTANCE.createStopAction();
+		startAction.setSuccessor_AbstractAction(stopAction);
+		stopAction.setPredecessor_AbstractAction(startAction);
+		guardedBranchTransition.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);		
+		BranchAction branchAction = createProbabilisticBranchAction(markovState, guardedTransitions, behaviorModel, seff);
+		resourceDemandingBehaviour.getSteps_Behaviour().add(branchAction);
+		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
+		resourceDemandingBehaviour.getSteps_Behaviour().add(startAction);
+		startAction.setSuccessor_AbstractAction(branchAction);
+		branchAction.setPredecessor_AbstractAction(startAction);
+		branchAction.setSuccessor_AbstractAction(stopAction);
+		stopAction.setPredecessor_AbstractAction(branchAction);
+		return guardedBranchTransition;
+	}
+	
+	/**
+	 * @param markovState
+	 * @param guardedTransitions
+	 * @param behaviorModel
+	 * @param seff
+	 * @return BranchAction
+	 * @throws IOException
+	 */
+	private BranchAction createProbabilisticBranchAction(final MarkovState markovState,
+			final List<GuardedTransition> guardedTransitions,
+			final BehaviorModel behaviorModel,
+			final ResourceDemandingSEFF seff) throws IOException {
+		BranchAction branchAction = SeffFactory.eINSTANCE.createBranchAction();
+		
+		double sumProbability = 0;
+		for (GuardedTransition guardedTransition:guardedTransitions) {
+			if (guardedTransition.guardIsTrue) {
+				sumProbability += guardedTransition.getTransition().getProbability();
+			}
+		}
+		
+		for (GuardedTransition guardedTransition:guardedTransitions) {
+			if (guardedTransition.guardIsTrue) {
+				ProbabilisticBranchTransition probabilisticBranchTransition = 
+						createProbabilisticBranchTransition(guardedTransition.getTransition(), seff, behaviorModel, 1.00/sumProbability, guardedTransition.getActions());
+				probabilisticBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
 			}
 		}
 		return branchAction;
@@ -172,12 +420,15 @@ public class SeffCreator {
 	 * @param seff
 	 * @param behaviorModel
 	 * @param first
-	 * @return
+	 * @return ProbabilisticBranchTransition
 	 * @throws IOException
 	 */
 	private ProbabilisticBranchTransition createProbabilisticBranchTransition(
-			final Transition transition, final ResourceDemandingSEFF seff,
-			final BehaviorModel behaviorModel) throws IOException {
+			final Transition transition,
+			final ResourceDemandingSEFF seff,
+			final BehaviorModel behaviorModel,
+			final double adjustfactor,
+			final EList<Action> transitionActions) throws IOException {
 
 		ProbabilisticBranchTransition probabilisticBranchTransition = SeffFactory.eINSTANCE
 				.createProbabilisticBranchTransition();
@@ -206,7 +457,7 @@ public class SeffCreator {
 		// add next markov state, outgoingTransition
 		ExternalCallAction targetState = createExternalCallActionNext(
 				seff.getBasicComponent_ServiceEffectSpecification(), transition
-						.getTargetState().getEId(), behaviorModel.getName());
+						.getTargetState().getEId(), behaviorModel.getName(), transitionActions);
 
 		if (targetState != null) {
 			resourceDemandingBehaviour.getSteps_Behaviour().add(targetState);
@@ -240,7 +491,7 @@ public class SeffCreator {
 		probabilisticBranchTransition
 				.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);
 		probabilisticBranchTransition.setBranchProbability(transition
-				.getProbability());
+				.getProbability() * adjustfactor);
 		return probabilisticBranchTransition;
 	}
 
@@ -258,14 +509,11 @@ public class SeffCreator {
 			throws IOException {
 		final ParametricResourceDemand parametricResourceDemand = SeffPerformanceFactory.eINSTANCE
 				.createParametricResourceDemand();
-
-		// PCM Random Variable for processingRate
-		final PCMRandomVariable pcmRandomVariable = CoreFactory.eINSTANCE
-				.createPCMRandomVariable();
-
+		
 		// load ResourceRepository
 		final ResourceRepository resourceRepository = creatorTools
 				.getResourceRepository(resourceSet);
+		PCMRandomVariable pcmRandomVariable = null;
 		for (final ResourceType resourceType : resourceRepository
 				.getAvailableResourceTypes_ResourceRepository()) {
 			if (resourceType instanceof ProcessingResourceType) {
@@ -277,8 +525,8 @@ public class SeffCreator {
 
 					// TODO: Use Deviation
 					// if deviation is zero just set the mean resource demand
-					pcmRandomVariable.setSpecification(Double
-							.toString(resourceDemand));
+					pcmRandomVariable = createPCMRandomVariable(Double
+					.toString(resourceDemand));
 
 					// pcmRandomVariable.setSpecification("Norm ("
 					// + resourceDemand + "," + deviation + ")");
@@ -289,6 +537,18 @@ public class SeffCreator {
 		parametricResourceDemand
 				.setSpecification_ParametericResourceDemand(pcmRandomVariable);
 		return parametricResourceDemand;
+	}
+	
+	/**
+	 * @param specification
+	 * @return
+	 */
+	private PCMRandomVariable createPCMRandomVariable(final String specification) {
+		// PCM Random Variable for processingRate
+		PCMRandomVariable pcmRandomVariable = CoreFactory.eINSTANCE
+				.createPCMRandomVariable();		
+		pcmRandomVariable.setSpecification(specification);
+		return pcmRandomVariable;
 	}
 
 	/**
@@ -394,9 +654,11 @@ public class SeffCreator {
 	 * @return ExternalCallAction
 	 */
 	private ExternalCallAction createExternalCallActionNext(
-			final BasicComponent bc, final String operationName,
-			final String componentName) {
-		ExternalCallAction externalAction = null;
+			final BasicComponent bc,
+			final String operationName,
+			final String componentName,
+			final EList<Action> transitionActions) {
+		ExternalCallAction externalCallAction = null;
 		EList<Interface> interfaceList = thisRepository
 				.getInterfaces__Repository();
 		for (Interface interfaceInstance : interfaceList) {
@@ -411,18 +673,28 @@ public class SeffCreator {
 								bc.getEntityName(),
 								interfaceInstance.getEntityName(),
 								thisRepository);
-						externalAction = SeffFactory.eINSTANCE
+						externalCallAction = SeffFactory.eINSTANCE
 								.createExternalCallAction();
-						externalAction.setEntityName(operationName);
-						externalAction
+						externalCallAction.setEntityName(operationName);
+						externalCallAction
 								.setCalledService_ExternalService(operationSignature);
-						externalAction.setRole_ExternalService(opreq);
+						externalCallAction.setRole_ExternalService(opreq);
+						if (transitionActions != null) {
+							setActions(externalCallAction, transitionActions);
+						}						
 					}
 				}
 			}
 		}
-
-		return externalAction;
+		return externalCallAction;
+	}
+	
+	private void setActions(final ExternalCallAction externalCallAction, final EList<Action> transitionActions) {
+		for (Action action : transitionActions) {
+			externalCallAction.getInputVariableUsages__CallAction().add(
+					createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
+							action.getActionParameter().getGuardActionParameterName() + ".VALUE +1 "));			
+		}		
 	}
 
 	/**
@@ -486,6 +758,79 @@ public class SeffCreator {
 			}
 		}
 		return opReqRole;
+	}
+	
+	/**
+	 * @author voegele
+	 *
+	 */
+	class GuardedTransition {
+		private Transition transition;
+		private EList<Guard> guards;
+		private EList<Action> actions;
+		private boolean guardIsTrue;
+
+		public GuardedTransition (final Transition transition, 
+				final EList<Guard> guards,
+				final EList<Action> actions,
+				final boolean guardIsTrue) {
+			this.transition = transition;
+			this.guards = guards;
+			this.actions = actions;
+			this.guardIsTrue = guardIsTrue;
+		}		
+		
+		/**
+		 * @return the actions
+		 */
+		public final EList<Action> getActions() {
+			return actions;
+		}
+
+		/**
+		 * @param actions the actions to set
+		 */
+		public final void setActions(EList<Action> actions) {
+			this.actions = actions;
+		}
+		
+		/**
+		 * @return the transition
+		 */
+		public final Transition getTransition() {
+			return transition;
+		}
+		/**
+		 * @param transition the transition to set
+		 */
+		public final void setTransition(Transition transition) {
+			this.transition = transition;
+		}
+		/**
+		 * @return the guards
+		 */
+		public final EList<Guard> getGuards() {
+			return guards;
+		}
+		/**
+		 * @param guards the guards to set
+		 */
+		public final void setGuards(EList<Guard> guards) {
+			this.guards = guards;
+		}
+		/**
+		 * @return the guardIsTrue
+		 */
+		public final boolean isGuardIsTrue() {
+			return guardIsTrue;
+		}
+		/**
+		 * @param guardIsTrue the guardIsTrue to set
+		 */
+		public final void setGuardIsTrue(boolean guardIsTrue) {
+			this.guardIsTrue = guardIsTrue;
+		}	
+		
 	}
 
 }
