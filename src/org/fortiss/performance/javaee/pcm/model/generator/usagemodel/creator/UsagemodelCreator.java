@@ -4,11 +4,11 @@ import java.io.IOException;
 
 import m4jdsl.BehaviorMix;
 import m4jdsl.BehaviorModel;
+import m4jdsl.GuardActionParameter;
+import m4jdsl.GuardActionParameterType;
 import m4jdsl.RelativeFrequency;
-
 import org.eclipse.emf.common.util.EList;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
-
 import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
@@ -31,7 +31,7 @@ import de.uka.ipd.sdq.pcm.usagemodel.UsagemodelFactory;
  * @author voegele
  * 
  */
-public class UsagemodelCreator {
+public class UsagemodelCreator extends AbstractCreator {
 
 	private CreatorTools creatorTools = CreatorTools.getInstance();
 
@@ -100,7 +100,7 @@ public class UsagemodelCreator {
 	 * Create new branch. Each Transition within this branch is a separate
 	 * behaviorModel.
 	 * 
-	 * @return
+	 * @return Branch
 	 * @throws IOException
 	 */
 	private Branch createBranch() throws IOException {
@@ -124,7 +124,7 @@ public class UsagemodelCreator {
 	 * component in the repository model.
 	 * 
 	 * @param behaviorModel
-	 * @return
+	 * @return EntryLevelSystemCall
 	 * @throws IOException
 	 */
 	private EntryLevelSystemCall createEntryLevelSystemCall(
@@ -148,7 +148,6 @@ public class UsagemodelCreator {
 						.getSignatures__OperationInterface();
 
 				for (OperationSignature operationSignature : operationSignatures) {
-
 					if (operationSignature.getEntityName().equals(Constants.INITIAL_NAME)) {
 						entryLevelSystemCall = UsagemodelFactory.eINSTANCE
 								.createEntryLevelSystemCall();
@@ -158,6 +157,7 @@ public class UsagemodelCreator {
 								.setOperationSignature__EntryLevelSystemCall(operationSignature);
 						entryLevelSystemCall
 								.setProvidedRole_EntryLevelSystemCall(opr);
+						setGuardActionParameter(entryLevelSystemCall);											
 						break;
 					}
 
@@ -165,6 +165,22 @@ public class UsagemodelCreator {
 			}
 		}
 		return entryLevelSystemCall;
+	}
+	
+	/**
+	 * @param entryLevelSystemCall
+	 */
+	private void setGuardActionParameter(final EntryLevelSystemCall entryLevelSystemCall) {
+		for (GuardActionParameter guardActionParameter : CreatorTools.getInstance().getThisWorkloadModel().getApplicationModel().getSessionLayerEFSM().
+				getGuardActionParameterList().getGuardActionParameters()) {
+			if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {
+				entryLevelSystemCall
+		        .getInputParameterUsages_EntryLevelSystemCall().add(createVariableUsage(guardActionParameter.getGuardActionParameterName(), "0"));
+			} else if (guardActionParameter.getParameterType() == GuardActionParameterType.BOOLEAN) {
+				entryLevelSystemCall
+		        .getInputParameterUsages_EntryLevelSystemCall().add(createVariableUsage(guardActionParameter.getGuardActionParameterName(), "true"));					
+			}
+		}	
 	}
 
 	/**

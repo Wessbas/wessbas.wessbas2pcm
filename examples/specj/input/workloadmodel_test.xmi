@@ -21,41 +21,37 @@
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId3_View_Items">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_Items=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_ItemsAdd_to_Cart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_ItemsAdd_to_Cart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemsclearcart++"/>
           <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="View_Itemsremove++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId5_shoppingcart">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="Add_to_Cartshoppingcart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="Add_to_Cartshoppingcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="shoppingcartclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="shoppingcartremove++"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="Add_to_Cartshoppingcart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="Add_to_Cartshoppingcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="shoppingcartclearcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcartremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId7_deferorder">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="logindeferorder > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="logindeferorder > 0"/>
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartdeferorder > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.14" condition="deferorder=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="logindeferorder--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="Add_to_Cartdeferorder > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="logindeferorder--"/>
           <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartdeferorder--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="Add_to_Cartdeferorder--"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId12_purchasecart">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="loginpurchasecart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="Add_to_Cartpurchasecart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.17" condition="purchasecart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="loginpurchasecart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="Add_to_Cartpurchasecart--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="loginpurchasecart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartpurchasecart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="loginpurchasecart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartpurchasecart--"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId3_View_Items">
@@ -76,30 +72,27 @@
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId3_View_Items">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_Items=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_ItemsAdd_to_Cart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_ItemsAdd_to_Cart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemsclearcart++"/>
           <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="View_Itemsremove++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId4_Add_to_Cart">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_ItemsAdd_to_Cart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.18" condition="Add_to_Cart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_ItemsAdd_to_Cart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="Add_to_Cartpurchasecart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartdeferorder++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="Add_to_Cartshoppingcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="Add_to_Cartclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.20" condition="Add_to_Cartremove++"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_ItemsAdd_to_Cart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_ItemsAdd_to_Cart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="Add_to_Cartshoppingcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.14" condition="Add_to_Cartclearcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="Add_to_Cartdeferorder++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartpurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="Add_to_Cartremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId8_home">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginhome > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.22" condition="home=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginhome--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.23" condition="homelogout++"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="loginhome > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="loginhome--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.17" condition="homelogout++"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId13_cancelorder">
@@ -192,20 +185,18 @@
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId10_inventory">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.24" condition="inventory=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.25" condition="inventorycancelorder++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.18" condition="inventory=true"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="inventorycancelorder++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId11_sellinventory">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.24" condition="${inventory}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.26" condition="sellinventory=true"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.18" condition="${inventory}"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId13_cancelorder">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.27" condition="logincancelorder > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.25" condition="inventorycancelorder > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.28" condition="cancelorder=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.27" condition="logincancelorder--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.25" condition="inventorycancelorder--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.20" condition="logincancelorder > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="inventorycancelorder > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.20" condition="logincancelorder--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="inventorycancelorder--"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId2_login">
@@ -226,18 +217,17 @@
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId3_View_Items">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_Items=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_ItemsAdd_to_Cart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.1" condition="View_ItemsAdd_to_Cart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemsclearcart++"/>
           <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="View_Itemsremove++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId10_inventory">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.24" condition="inventory=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.25" condition="inventorycancelorder++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.18" condition="inventory=true"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="inventorycancelorder++"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId9_logout">
@@ -293,31 +283,28 @@
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId5_shoppingcart">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="Add_to_Cartshoppingcart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemsshoppingcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="Add_to_Cartshoppingcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="shoppingcartclearcart++"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="shoppingcartremove++"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="Add_to_Cartshoppingcart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.2" condition="View_Itemsshoppingcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="Add_to_Cartshoppingcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="shoppingcartclearcart++"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcartremove++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId7_deferorder">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="logindeferorder > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="logindeferorder > 0"/>
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartdeferorder > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.14" condition="deferorder=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="logindeferorder--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="Add_to_Cartdeferorder > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="logindeferorder--"/>
           <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.4" condition="View_Itemsdeferorder--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartdeferorder--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="Add_to_Cartdeferorder--"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId12_purchasecart">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="loginpurchasecart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="Add_to_Cartpurchasecart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.17" condition="purchasecart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="loginpurchasecart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemspurchasecart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="Add_to_Cartpurchasecart--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="loginpurchasecart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartpurchasecart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.12" condition="loginpurchasecart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.5" condition="View_Itemspurchasecart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.13" condition="Add_to_Cartpurchasecart--"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId11_sellinventory">
@@ -337,15 +324,13 @@
         </protocolDetails>
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId8_home">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginhome > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.22" condition="home=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginhome--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.23" condition="homelogout++"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="loginhome > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.16" condition="loginhome--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.17" condition="homelogout++"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId11_sellinventory">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.24" condition="${inventory}"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.26" condition="sellinventory=true"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.18" condition="${inventory}"/>
         </outgoingTransitions>
       </applicationStates>
       <applicationStates eId="ASId5_shoppingcart">
@@ -365,61 +350,49 @@
         </protocolDetails>
         <outgoingTransitions targetState="$"/>
         <outgoingTransitions targetState="ASId6_clearcart">
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.29" condition="loginclearcart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsclearcart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="Add_to_Cartclearcart > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="shoppingcartclearcart > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.30" condition="clearcart=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.29" condition="loginclearcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsclearcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.19" condition="Add_to_Cartclearcart--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.10" condition="shoppingcartclearcart--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginclearcart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemsclearcart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.14" condition="Add_to_Cartclearcart > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="shoppingcartclearcart > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.21" condition="loginclearcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.3" condition="View_Itemsclearcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.14" condition="Add_to_Cartclearcart--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.8" condition="shoppingcartclearcart--"/>
         </outgoingTransitions>
         <outgoingTransitions targetState="ASId14_remove">
           <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.0" condition="${login}"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="View_Itemsremove > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.20" condition="Add_to_Cartremove > 0"/>
-          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="shoppingcartremove > 0"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.31" condition="remove=true"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.7" condition="View_Itemsremove--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.20" condition="Add_to_Cartremove--"/>
-          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.11" condition="shoppingcartremove--"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsremove > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="Add_to_Cartremove > 0"/>
+          <guard guardParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcartremove > 0"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.6" condition="View_Itemsremove--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.15" condition="Add_to_Cartremove--"/>
+          <action actionParameter="//@applicationModel/@sessionLayerEFSM/@guardActionParameterList/@guardActionParameters.9" condition="shoppingcartremove--"/>
         </outgoingTransitions>
       </applicationStates>
       <exitState eId="$"/>
       <guardActionParameterList>
-        <guardActionParameters guardActionParameterName="login"/>
-        <guardActionParameters guardActionParameterName="View_Items"/>
-        <guardActionParameters guardActionParameterName="View_ItemsAdd_to_Cart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="View_Itemspurchasecart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="View_Itemsdeferorder" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="View_Itemsshoppingcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="View_Itemsclearcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="View_Itemsremove" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cartshoppingcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="shoppingcart"/>
-        <guardActionParameters guardActionParameterName="shoppingcartclearcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="shoppingcartremove" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="logindeferorder" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cartdeferorder" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="deferorder"/>
-        <guardActionParameters guardActionParameterName="loginpurchasecart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cartpurchasecart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="purchasecart"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cart"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cartclearcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="Add_to_Cartremove" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="loginhome" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="home"/>
-        <guardActionParameters guardActionParameterName="homelogout" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="inventory"/>
-        <guardActionParameters guardActionParameterName="inventorycancelorder" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="sellinventory"/>
-        <guardActionParameters guardActionParameterName="logincancelorder" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="cancelorder"/>
-        <guardActionParameters guardActionParameterName="loginclearcart" parameterType="INTEGER"/>
-        <guardActionParameters guardActionParameterName="clearcart"/>
-        <guardActionParameters guardActionParameterName="remove"/>
+        <guardActionParameters guardActionParameterName="login" sourceName="login"/>
+        <guardActionParameters guardActionParameterName="View_ItemsAdd_to_Cart" parameterType="INTEGER" sourceName="View_Items" targetName="Add_to_Cart"/>
+        <guardActionParameters guardActionParameterName="View_Itemsshoppingcart" parameterType="INTEGER" sourceName="View_Items" targetName="shoppingcart"/>
+        <guardActionParameters guardActionParameterName="View_Itemsclearcart" parameterType="INTEGER" sourceName="View_Items" targetName="clearcart"/>
+        <guardActionParameters guardActionParameterName="View_Itemsdeferorder" parameterType="INTEGER" sourceName="View_Items" targetName="deferorder"/>
+        <guardActionParameters guardActionParameterName="View_Itemspurchasecart" parameterType="INTEGER" sourceName="View_Items" targetName="purchasecart"/>
+        <guardActionParameters guardActionParameterName="View_Itemsremove" parameterType="INTEGER" sourceName="View_Items" targetName="remove"/>
+        <guardActionParameters guardActionParameterName="Add_to_Cartshoppingcart" parameterType="INTEGER" sourceName="Add_to_Cart" targetName="shoppingcart"/>
+        <guardActionParameters guardActionParameterName="shoppingcartclearcart" parameterType="INTEGER" sourceName="shoppingcart" targetName="clearcart"/>
+        <guardActionParameters guardActionParameterName="shoppingcartremove" parameterType="INTEGER" sourceName="shoppingcart" targetName="remove"/>
+        <guardActionParameters guardActionParameterName="logindeferorder" parameterType="INTEGER" sourceName="login" targetName="deferorder"/>
+        <guardActionParameters guardActionParameterName="Add_to_Cartdeferorder" parameterType="INTEGER" sourceName="Add_to_Cart" targetName="deferorder"/>
+        <guardActionParameters guardActionParameterName="loginpurchasecart" parameterType="INTEGER" sourceName="login" targetName="purchasecart"/>
+        <guardActionParameters guardActionParameterName="Add_to_Cartpurchasecart" parameterType="INTEGER" sourceName="Add_to_Cart" targetName="purchasecart"/>
+        <guardActionParameters guardActionParameterName="Add_to_Cartclearcart" parameterType="INTEGER" sourceName="Add_to_Cart" targetName="clearcart"/>
+        <guardActionParameters guardActionParameterName="Add_to_Cartremove" parameterType="INTEGER" sourceName="Add_to_Cart" targetName="remove"/>
+        <guardActionParameters guardActionParameterName="loginhome" parameterType="INTEGER" sourceName="login" targetName="home"/>
+        <guardActionParameters guardActionParameterName="homelogout" parameterType="INTEGER" sourceName="home" targetName="logout"/>
+        <guardActionParameters guardActionParameterName="inventory" sourceName="inventory"/>
+        <guardActionParameters guardActionParameterName="inventorycancelorder" parameterType="INTEGER" sourceName="inventory" targetName="cancelorder"/>
+        <guardActionParameters guardActionParameterName="logincancelorder" parameterType="INTEGER" sourceName="login" targetName="cancelorder"/>
+        <guardActionParameters guardActionParameterName="loginclearcart" parameterType="INTEGER" sourceName="login" targetName="clearcart"/>
       </guardActionParameterList>
     </sessionLayerEFSM>
   </applicationModel>

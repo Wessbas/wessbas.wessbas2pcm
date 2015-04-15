@@ -1,25 +1,16 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import m4jdsl.BehaviorModel;
 import m4jdsl.GuardActionParameter;
 import m4jdsl.GuardActionParameterType;
 import m4jdsl.MarkovState;
 import m4jdsl.WorkloadModel;
-
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Configuration;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
-
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
-import de.uka.ipd.sdq.pcm.repository.DataType;
 import de.uka.ipd.sdq.pcm.repository.OperationInterface;
 import de.uka.ipd.sdq.pcm.repository.OperationProvidedRole;
 import de.uka.ipd.sdq.pcm.repository.OperationSignature;
@@ -27,7 +18,6 @@ import de.uka.ipd.sdq.pcm.repository.Parameter;
 import de.uka.ipd.sdq.pcm.repository.ParameterModifier;
 import de.uka.ipd.sdq.pcm.repository.PrimitiveDataType;
 import de.uka.ipd.sdq.pcm.repository.PrimitiveTypeEnum;
-import de.uka.ipd.sdq.pcm.repository.Repository;
 import de.uka.ipd.sdq.pcm.repository.RepositoryComponent;
 import de.uka.ipd.sdq.pcm.repository.RepositoryFactory;
 import de.uka.ipd.sdq.pcm.seff.ResourceDemandingSEFF;
@@ -40,7 +30,7 @@ import de.uka.ipd.sdq.pcm.seff.SeffFactory;
  * @author voegele
  * 
  */
-public class RepositoryCreator {
+public class RepositoryCreator extends AbstractCreator {
 
 	private CreatorTools creatorTools = CreatorTools.getInstance();
 	private SeffCreator seffCreator = new SeffCreator();
@@ -234,8 +224,7 @@ public class RepositoryCreator {
 				e.printStackTrace();
 			}
 			parameter.setDataType__Parameter(primitiveDataType);		
-		}
-		
+		}		
 		return parameter;
 	}
 
@@ -260,55 +249,4 @@ public class RepositoryCreator {
 				creatorTools.getThisRepository(), behaviorModel);
 	}
 	
-	/**
-	 * copy the requested PrimitiveDataType to the given PCM Repository and return a reference
-	 * @param dataTypeRepository the Repository Object to which the PrimitiveDataType is copied
-	 * @param resourceSet the ResourceSet for the Generator
-	 * @param type the PrimitiveTypeEnum for which a PrimitiveDataType should be copied
-	 * @return the copied PrimitiveDataType
-	 * @throws IOException
-	 */
-	private static PrimitiveDataType importExternalPrimitiveDataType(Repository dataTypeRepository, ResourceSet resourceSet, PrimitiveTypeEnum type) throws IOException {
-		PrimitiveDataType palladioType = null;
-		PrimitiveDataType copiedType = null;
-		boolean typeAlreadyPresent = false;
-		for(DataType dataType : dataTypeRepository.getDataTypes__Repository()) {
-			if(dataType instanceof PrimitiveDataType) {
-				if (((PrimitiveDataType) dataType).getType() == type) {
-					typeAlreadyPresent = true;
-					copiedType = (PrimitiveDataType) dataType;
-				}
-			}
-		}
-		if(!typeAlreadyPresent) {
-			palladioType = getPrimitiveDataType(resourceSet, type);
-			copiedType = EcoreUtil.copy(palladioType);
-			copiedType.setRepository__DataType(dataTypeRepository);
-			dataTypeRepository.getDataTypes__Repository().add(copiedType);
-		}
-		return copiedType;
-	}
-	
-	private static PrimitiveDataType getPrimitiveDataType(ResourceSet resourceSet, PrimitiveTypeEnum type) throws IOException {
-		PrimitiveDataType requestedType = null;
-		Repository dataTypeRepository = getPrimitiveTypeRepository(resourceSet);
-		EList<DataType> dataTypes = dataTypeRepository.getDataTypes__Repository();
-		for(DataType dataType : dataTypes) {
-			if(dataType instanceof PrimitiveDataType)
-				if(((PrimitiveDataType)dataType).getType() == type)
-					requestedType = (PrimitiveDataType)dataType;
-		}
-		return requestedType;
-	}
-	
-	private static Repository getPrimitiveTypeRepository(ResourceSet resourceSet) throws IOException {				
-		Resource primitiveTypeResource = resourceSet.getResource(
-				URI.createURI("pathmap://PCM_MODELS/PrimitiveTypes.repository"),
-				true);
-		primitiveTypeResource.load(Collections.EMPTY_MAP);
-		EObject rootTypeResource = primitiveTypeResource.getContents().get(0);
-		Repository typeRepository = (Repository) rootTypeResource;
-		return typeRepository;		
-	}
-
 }

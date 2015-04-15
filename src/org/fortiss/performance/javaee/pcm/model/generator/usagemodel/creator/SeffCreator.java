@@ -11,6 +11,7 @@ import m4jdsl.ApplicationState;
 import m4jdsl.ApplicationTransition;
 import m4jdsl.BehaviorModel;
 import m4jdsl.Guard;
+import m4jdsl.GuardActionParameter;
 import m4jdsl.GuardActionParameterType;
 import m4jdsl.MarkovState;
 import m4jdsl.NormallyDistributedThinkTime;
@@ -21,11 +22,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 
-import de.uka.ipd.sdq.pcm.core.CoreFactory;
 import de.uka.ipd.sdq.pcm.core.PCMRandomVariable;
-import de.uka.ipd.sdq.pcm.parameter.ParameterFactory;
-import de.uka.ipd.sdq.pcm.parameter.VariableCharacterisation;
-import de.uka.ipd.sdq.pcm.parameter.VariableCharacterisationType;
 import de.uka.ipd.sdq.pcm.parameter.VariableUsage;
 import de.uka.ipd.sdq.pcm.repository.BasicComponent;
 import de.uka.ipd.sdq.pcm.repository.Interface;
@@ -54,8 +51,6 @@ import de.uka.ipd.sdq.pcm.seff.StartAction;
 import de.uka.ipd.sdq.pcm.seff.StopAction;
 import de.uka.ipd.sdq.pcm.seff.seff_performance.ParametricResourceDemand;
 import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
-import de.uka.ipd.sdq.stoex.StoexFactory;
-import de.uka.ipd.sdq.stoex.VariableReference;
 
 /**
  * This class is called from the RepositoryCreator class. It created seff based
@@ -64,7 +59,7 @@ import de.uka.ipd.sdq.stoex.VariableReference;
  * @author voegele
  * 
  */
-public class SeffCreator {
+public class SeffCreator extends AbstractCreator {
 
 	private CreatorTools creatorTools = CreatorTools.getInstance();
 	private ResourceSet thisResourceSet;
@@ -97,8 +92,7 @@ public class SeffCreator {
 
 			ExternalCallAction firstExternalCallAction = null;
 			ExternalCallAction nextExternalCallAction = null;
-			BranchAction branchAction = null;
-			
+			BranchAction branchAction = null;			
 			
 			// check initial state
 			if (seff.getDescribedService__SEFF().getEntityName().equals(Constants.INITIAL_NAME)) {
@@ -112,7 +106,7 @@ public class SeffCreator {
 			} else {			
 				branchAction = createGuardedBranchAction(seff, behaviorModel);
 			}	
-
+			
 			// connect new nodes
 			if (firstExternalCallAction != null && nextExternalCallAction != null) {
 				seff.getSteps_Behaviour().add(firstExternalCallAction);
@@ -540,18 +534,6 @@ public class SeffCreator {
 	}
 	
 	/**
-	 * @param specification
-	 * @return
-	 */
-	private PCMRandomVariable createPCMRandomVariable(final String specification) {
-		// PCM Random Variable for processingRate
-		PCMRandomVariable pcmRandomVariable = CoreFactory.eINSTANCE
-				.createPCMRandomVariable();		
-		pcmRandomVariable.setSpecification(specification);
-		return pcmRandomVariable;
-	}
-
-	/**
 	 * @param transition
 	 * @return InternalAction
 	 * @throws IOException
@@ -589,7 +571,6 @@ public class SeffCreator {
 					.getProvidedInterface__OperationProvidedRole();
 			final EList<OperationSignature> operationSignatures = oi
 					.getSignatures__OperationInterface();
-
 			int indexOfChar = operationName.indexOf("_", 1);
 			String newOperationName = operationName.substring(indexOfChar + 1,
 					operationName.length());
@@ -617,32 +598,6 @@ public class SeffCreator {
 			}
 		}
 		return externalAction;
-	}
-
-	/**
-	 * create a VariableUsage defining a value for a parameter
-	 * 
-	 * @param parameterName
-	 *            the name of the parameter
-	 * @param value
-	 *            the value to set
-	 * @return the VariableUsage created
-	 */
-	public VariableUsage createVariableUsage(String parameterName, String value) {
-		VariableUsage usage = ParameterFactory.eINSTANCE.createVariableUsage();
-		VariableCharacterisation characterisation = ParameterFactory.eINSTANCE
-				.createVariableCharacterisation();
-		PCMRandomVariable PCMVariable = CoreFactory.eINSTANCE
-				.createPCMRandomVariable();
-		PCMVariable.setSpecification(value);
-		characterisation.setSpecification_VariableCharacterisation(PCMVariable);
-		characterisation.setType(VariableCharacterisationType.VALUE);
-		usage.getVariableCharacterisation_VariableUsage().add(characterisation);
-		VariableReference reference = StoexFactory.eINSTANCE
-				.createVariableReference();
-		reference.setReferenceName(parameterName);
-		usage.setNamedReference__VariableUsage(reference);
-		return usage;
 	}
 
 	/**
@@ -679,9 +634,7 @@ public class SeffCreator {
 						externalCallAction
 								.setCalledService_ExternalService(operationSignature);
 						externalCallAction.setRole_ExternalService(opreq);
-						if (transitionActions != null) {
-							setActions(externalCallAction, transitionActions);
-						}						
+						setActions(externalCallAction, transitionActions);					
 					}
 				}
 			}
@@ -689,14 +642,80 @@ public class SeffCreator {
 		return externalCallAction;
 	}
 	
+	/**
+	 * Create inputvariables in the seffs. If a action is defined in transitionActions use this one, otherwise take old value. 
+	 * 
+	 * @param externalCallAction
+	 * @param transitionActions
+	 */
 	private void setActions(final ExternalCallAction externalCallAction, final EList<Action> transitionActions) {
-		for (Action action : transitionActions) {
-			externalCallAction.getInputVariableUsages__CallAction().add(
-					createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
-							action.getActionParameter().getGuardActionParameterName() + ".VALUE +1 "));			
-		}		
+		for (GuardActionParameter guardActionParameter : CreatorTools.getInstance().getThisWorkloadModel().getApplicationModel().getSessionLayerEFSM().
+				getGuardActionParameterList().getGuardActionParameters()) {		
+			Action action = guardActionParameterInActionList(transitionActions, guardActionParameter);				
+			if (action != null) {
+				if (action.getActionParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {
+					externalCallAction.getInputVariableUsages__CallAction().add(
+							createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
+									"true"));							
+				} else if (action.getActionParameter().getParameterType() == GuardActionParameterType.INTEGER) {
+					externalCallAction.getInputVariableUsages__CallAction().add(
+							createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
+									action.getActionParameter().getGuardActionParameterName() + ".VALUE + 1"));	
+				}	
+			} else {				
+				if (transitionActions == null) {
+					if (guardActionParameter.getSourceName().equals(externalCallAction.getCalledService_ExternalService().getEntityName())) {
+						if (guardActionParameter.getParameterType() == GuardActionParameterType.BOOLEAN) {
+							externalCallAction.getInputVariableUsages__CallAction().add(
+									createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
+											"true"));							
+						} else if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {
+							externalCallAction.getInputVariableUsages__CallAction().add(
+									createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
+											guardActionParameter.getGuardActionParameterName() + ".VALUE + 1"));	
+						}	
+					} else {
+						if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {
+							externalCallAction.getInputVariableUsages__CallAction().add(
+									createVariableUsage(guardActionParameter.getGuardActionParameterName(), guardActionParameter.getGuardActionParameterName() + ".VALUE"));
+						} else if (guardActionParameter.getParameterType() == GuardActionParameterType.BOOLEAN) {
+							externalCallAction.getInputVariableUsages__CallAction().add(
+									createVariableUsage(guardActionParameter.getGuardActionParameterName(), guardActionParameter.getGuardActionParameterName() + ".VALUE"));					
+						}
+					}	
+				} else {
+					if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {
+						externalCallAction.getInputVariableUsages__CallAction().add(
+								createVariableUsage(guardActionParameter.getGuardActionParameterName(), guardActionParameter.getGuardActionParameterName() + ".VALUE"));
+					} else if (guardActionParameter.getParameterType() == GuardActionParameterType.BOOLEAN) {
+						externalCallAction.getInputVariableUsages__CallAction().add(
+								createVariableUsage(guardActionParameter.getGuardActionParameterName(), guardActionParameter.getGuardActionParameterName() + ".VALUE"));					
+					}
+				}
+			}
+		}				
 	}
 
+	/**
+	 * @param transitionActions
+	 * @param guardActionParameter
+	 * @return boolean
+	 */
+	private Action guardActionParameterInActionList(final EList<Action> transitionActions,
+			final GuardActionParameter guardActionParameter) {
+		
+		if (transitionActions == null) {
+			return null;
+		}
+		
+		for (Action action : transitionActions) {
+			if (action.getActionParameter().equals(guardActionParameter)) {
+				return action;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Set required role to all required interfaces. When toComponent is set to
 	 * null then the required role will be set to all existing interfaces.
