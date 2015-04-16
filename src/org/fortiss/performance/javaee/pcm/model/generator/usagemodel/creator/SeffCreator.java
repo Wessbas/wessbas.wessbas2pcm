@@ -658,9 +658,15 @@ public class SeffCreator extends AbstractCreator {
 							createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
 									"true"));							
 				} else if (action.getActionParameter().getParameterType() == GuardActionParameterType.INTEGER) {
-					externalCallAction.getInputVariableUsages__CallAction().add(
-							createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
-									action.getActionParameter().getGuardActionParameterName() + ".VALUE + 1"));	
+					if (externalCallAction.getCalledService_ExternalService().getEntityName().equals(action.getActionParameter().getTargetName())) {
+						externalCallAction.getInputVariableUsages__CallAction().add(
+								createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
+										action.getActionParameter().getGuardActionParameterName() + ".VALUE - 1"));	
+					} else if (externalCallAction.getCalledService_ExternalService().getEntityName().equals(action.getActionParameter().getSourceName())) {
+						externalCallAction.getInputVariableUsages__CallAction().add(
+								createVariableUsage(action.getActionParameter().getGuardActionParameterName(), 
+										action.getActionParameter().getGuardActionParameterName() + ".VALUE + 1"));	
+					}		
 				}	
 			} else {				
 				if (transitionActions == null) {
@@ -670,9 +676,15 @@ public class SeffCreator extends AbstractCreator {
 									createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
 											"true"));							
 						} else if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {
-							externalCallAction.getInputVariableUsages__CallAction().add(
-									createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
-											guardActionParameter.getGuardActionParameterName() + ".VALUE + 1"));	
+							if (externalCallAction.getCalledService_ExternalService().getEntityName().equals(guardActionParameter.getTargetName())) {
+								externalCallAction.getInputVariableUsages__CallAction().add(
+										createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
+												guardActionParameter.getGuardActionParameterName() + ".VALUE - 1"));	
+							} else 	if (externalCallAction.getCalledService_ExternalService().getEntityName().equals(guardActionParameter.getSourceName())) {
+								externalCallAction.getInputVariableUsages__CallAction().add(
+										createVariableUsage(guardActionParameter.getGuardActionParameterName(), 
+												guardActionParameter.getGuardActionParameterName() + ".VALUE + 1"));	
+							} 
 						}	
 					} else {
 						if (guardActionParameter.getParameterType() == GuardActionParameterType.INTEGER) {

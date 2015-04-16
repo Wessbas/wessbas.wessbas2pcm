@@ -1,7 +1,7 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration;
 
 public class Constants {
-	public static final String MODEL_DIRECTORY = "C:/Users/voegele/Applications/eclipse-jee-kepler-SR2-win32-x86_64/eclipse/workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/output/specjTest/";
+	public static final String MODEL_DIRECTORY = "C:/Users/voegele/Applications/eclipse-jee-juno-SR2-win32-x86_64_3/eclipse/workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/output/specjTest/";
 	public static final String USAGE_MODEL_NAME = "test.usagemodel";
 	public static final String REPOSITORY_MODEL_NAME = "test.repository";
 	public static final String ALLOCATION_MODEL_NAME = "test.allocation";
