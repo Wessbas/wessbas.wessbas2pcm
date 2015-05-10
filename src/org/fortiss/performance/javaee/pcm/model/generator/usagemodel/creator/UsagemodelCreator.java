@@ -107,14 +107,13 @@ public class UsagemodelCreator extends AbstractCreator {
 		Branch branch = UsagemodelFactory.eINSTANCE.createBranch();
 		branch.setEntityName("BehaviorMix");
 
-		EList<BehaviorModel> behaviorModelsList = creatorTools.getThisWorkloadModel()
-				.getBehaviorModels();
 		BehaviorMix behaviorMix = creatorTools.getThisWorkloadModel().getBehaviorMix();
 		EList<RelativeFrequency> relativeFrequencyList = behaviorMix
 				.getRelativeFrequencies();
+		
 		for (int i = 0; i < relativeFrequencyList.size(); i++) {
 			createBranchTransition(branch, relativeFrequencyList.get(i)
-					.getValue(), behaviorModelsList.get(i));
+					.getValue(), relativeFrequencyList.get(i).getBehaviorModel());
 		}
 		return branch;
 	}
@@ -178,7 +177,7 @@ public class UsagemodelCreator extends AbstractCreator {
 		        .getInputParameterUsages_EntryLevelSystemCall().add(createVariableUsage(guardActionParameter.getGuardActionParameterName(), "0"));
 			} else if (guardActionParameter.getParameterType() == GuardActionParameterType.BOOLEAN) {
 				entryLevelSystemCall
-		        .getInputParameterUsages_EntryLevelSystemCall().add(createVariableUsage(guardActionParameter.getGuardActionParameterName(), "true"));					
+		        .getInputParameterUsages_EntryLevelSystemCall().add(createVariableUsage(guardActionParameter.getGuardActionParameterName(), "false"));					
 			}
 		}	
 	}

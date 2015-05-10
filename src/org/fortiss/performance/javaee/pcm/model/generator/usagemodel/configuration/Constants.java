@@ -1,7 +1,8 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration;
 
 public class Constants {
-	public static final String MODEL_DIRECTORY = "C:/Users/voegele/Applications/eclipse-jee-juno-SR2-win32-x86_64_3/eclipse/workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/output/specjTest/";
+	public static final String MODEL_DIRECTORY_SOURCE = "C:/Users/voegele/git/wessbas.wessbas2pcm/examples/specj/output/specjPCM_SUT/";
+	public static final String MODEL_DIRECTORY = "C:/Users/voegele/git/wessbas.wessbas2pcm/examples/specj/output/specjTest/";
 	public static final String USAGE_MODEL_NAME = "test.usagemodel";
 	public static final String REPOSITORY_MODEL_NAME = "test.repository";
 	public static final String ALLOCATION_MODEL_NAME = "test.allocation";
@@ -12,6 +13,6 @@ public class Constants {
 	public static final String INPUT_FILE_DELIMITER_PARAMETERPAIR = "/";
 	public static final String INPUT_FILE_DELIMITER_PARAMETER = "=";
 	public static final String BEHAVIORMODELCONTAINER = "aName";
-	public static final String XMI_FILE = "./workspace/org.fortiss.performance.javaee.pcm.model.generator.usagemodel/examples/specj/input/workloadmodel_test.xmi";
+	public static final String XMI_FILE = "file:///C:/Users/voegele/git/wessbas.wessbas2pcm/examples/specj/input/workloadmodel_test.xmi";
 	public static final String INITIAL_NAME = "INITIAL"; 
 }

@@ -163,7 +163,7 @@ public class SeffCreator extends AbstractCreator {
 					// get guards of markovState 
 					LinkedHashMap<Transition, EList<Guard>> guards = getGuards(seff, behaviorModel, markovState);					
 							
-					// get all combinations of guards except the combination all are false
+					// get all combinations of guards except the combination all 
 					HashMap<String, List<GuardedTransition>> guardCombinations = getCombinations(guards, actions);
 					
 					// for each combination create a new guarded transition 
@@ -173,7 +173,7 @@ public class SeffCreator extends AbstractCreator {
 						guardedBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
 					}						
 					
-				// in this case are no guards needed	
+				// in this case guards are not needed	
 				} else {							
 					for (Transition transition : markovState
 							.getOutgoingTransitions()) {													
@@ -205,7 +205,11 @@ public class SeffCreator extends AbstractCreator {
 			guardString = guardString + " ( ";			
 			for (int s = 0; s < guardedTransitions.get(i).getGuards().size() ; s++) {						
 				if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {					
-					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true ";					
+					if (guardedTransitions.get(i).getGuards().get(s).isNegate()) {
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true ";
+					} else {
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==false ";
+					}				
 				} else if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.INTEGER) {					
 					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE > 0 ";					
 				}				
