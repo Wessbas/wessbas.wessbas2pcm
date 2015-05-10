@@ -1,7 +1,11 @@
 package org.fortiss.performance.javaee.pcm.model.generator.usagemodel;
 
+import java.io.File;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.configuration.Constants;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.AllocationCreator;
+import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.CreatorTools;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.RepositoryCreator;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.SystemCreator;
 import org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator.UsagemodelCreator;
@@ -37,7 +41,11 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 
 		super.start(context);
-
+		
+		// delete MODEL_DIRECTORY and add content of MODEL_DIRECTORY_SOURCE to MODEL_DIRECTORY
+		CreatorTools.deleteFiles(new File(Constants.MODEL_DIRECTORY));
+		CreatorTools.copyPCMFilesSourceTarget();
+		
 		// create new component in repository
 		RepositoryCreator repositoryCreator = new RepositoryCreator();
 		repositoryCreator.createBehaviorModelComponents();
