@@ -2,9 +2,12 @@ package org.fortiss.performance.javaee.pcm.model.generator.usagemodel.creator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import m4jdsl.Action;
 import m4jdsl.ApplicationState;
@@ -158,7 +161,7 @@ public class SeffCreator extends AbstractCreator {
 				LinkedHashMap<Transition, EList<Action>> actions = getActions(seff, behaviorModel, markovState);
 				
 				if (markovState
-						.getOutgoingTransitions().size() > 1) {
+						.getOutgoingTransitions().size() > 1 && Constants.SET_GUARDS_ACTIONS) {
 					
 					// get guards of markovState 
 					LinkedHashMap<Transition, EList<Guard>> guards = getGuards(seff, behaviorModel, markovState);					
@@ -166,8 +169,11 @@ public class SeffCreator extends AbstractCreator {
 					// get all combinations of guards except the combination all 
 					HashMap<String, List<GuardedTransition>> guardCombinations = getCombinations(guards, actions);
 					
+					TreeMap<String, List<GuardedTransition>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER.reversed());
+					result.putAll(guardCombinations);	    
+								
 					// for each combination create a new guarded transition 
-					for (String combination : guardCombinations.keySet()) {	
+					for (String combination : result.keySet()) {	
 						List<GuardedTransition> guardedTransitions = guardCombinations.get(combination);
 						GuardedBranchTransition guardedBranchTransition = createGuardedBranchTransition(markovState, behaviorModel, guardedTransitions, seff, combination);		
 						guardedBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
@@ -190,6 +196,7 @@ public class SeffCreator extends AbstractCreator {
 		return branchAction;
 	}	
 	
+
 	/**
 	 * Get the strings for the guardedTransitions.
 	 * 
@@ -198,6 +205,7 @@ public class SeffCreator extends AbstractCreator {
 	 */
 	private String getGuardString(final List<GuardedTransition> guardedTransitions) {
 		String guardString = "";		
+			
 		for (int i = 0; i < guardedTransitions.size() ; i++) {
 			if (!guardedTransitions.get(i).guardIsTrue) {
 				guardString = guardString + " NOT ";
@@ -206,18 +214,18 @@ public class SeffCreator extends AbstractCreator {
 			for (int s = 0; s < guardedTransitions.get(i).getGuards().size() ; s++) {						
 				if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {					
 					if (guardedTransitions.get(i).getGuards().get(s).isNegate()) {
-						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true ";
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true";
 					} else {
-						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==false ";
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==false";
 					}				
 				} else if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.INTEGER) {					
-					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE > 0 ";					
+					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE >" + guardedTransitions.get(i).getGuards().get(s).getDiffMinimum();					
 				}				
 				if (s != guardedTransitions.get(i).getGuards().size() -1) {
 					guardString = guardString + " AND ";
 				}				
 			}			
-			guardString = guardString + " ) ";			
+			guardString = guardString + " ) ";		
 			if (i != guardedTransitions.size() -1) {
 				guardString = guardString + " AND ";
 			}
@@ -231,9 +239,9 @@ public class SeffCreator extends AbstractCreator {
 	 */
 	private HashMap<String, List<GuardedTransition>> getCombinations(final LinkedHashMap<Transition, EList<Guard>> guards, final LinkedHashMap<Transition, EList<Action>> actions) {
 		double size = (double) guards.size();
-		double numberOfCombinations = Math.pow(2, size);
+		int numberOfCombinations = (int) Math.pow(2, size);
 		HashMap<String, List<GuardedTransition>> guardCombinations = new HashMap<String, List<GuardedTransition>>();
-		for (int i = 1; i < numberOfCombinations; i++) {
+		for (int i = numberOfCombinations-1; i > 0; i--) {
 			String binaryString = addMissingZeros(Integer.toBinaryString(i), (int) size);
 			List<GuardedTransition> guardedTransitionList = new ArrayList<GuardedTransition>();
 			int s = 0;
@@ -359,7 +367,7 @@ public class SeffCreator extends AbstractCreator {
 			final ResourceDemandingSEFF seff,
 			final String guardName) throws IOException {
 		GuardedBranchTransition guardedBranchTransition = SeffFactory.eINSTANCE.createGuardedBranchTransition();
-		guardedBranchTransition.setBranchCondition_GuardedBranchTransition(createPCMRandomVariable(getGuardString(guardedTransitions)));
+		guardedBranchTransition.setBranchCondition_GuardedBranchTransition(createPCMRandomVariable(getGuardString(guardedTransitions)));	
 		guardedBranchTransition.setEntityName(guardName);
 		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
 				.createResourceDemandingBehaviour();
@@ -520,15 +528,14 @@ public class SeffCreator extends AbstractCreator {
 						resourceDemandType)) {
 					parametricResourceDemand
 							.setRequiredResource_ParametricResourceDemand(processingResourceType);
-
-					// TODO: Use Deviation
-					// if deviation is zero just set the mean resource demand
-					pcmRandomVariable = createPCMRandomVariable(Double
-					.toString(resourceDemand));
-
-					// pcmRandomVariable.setSpecification("Norm ("
-					// + resourceDemand + "," + deviation + ")");
-
+					
+					if (deviation == 0) { 
+						pcmRandomVariable = createPCMRandomVariable(Double
+						.toString(resourceDemand));
+					} else {					
+						pcmRandomVariable = createPCMRandomVariable("Norm ("
+						 + resourceDemand + ", "  +   Math.sqrt(deviation)  +   " )");
+					}
 				}
 			}
 		}
