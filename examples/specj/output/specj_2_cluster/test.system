@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system:System xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:composition="http://sdq.ipd.uka.de/PalladioComponentModel/Core/Composition/5.0" xmlns:repository="http://sdq.ipd.uka.de/PalladioComponentModel/Repository/5.0" xmlns:system="http://sdq.ipd.uka.de/PalladioComponentModel/System/5.0" id="_P78-0BOOEeW9TJBXTvQ7yQ">
+  <assemblyContexts__ComposedStructure id="_j52w3zjNLkVjgw2XtR2Mug" entityName="specj">
+    <encapsulatedComponent__AssemblyContext xsi:type="repository:CompositeComponent" href="test.repository#_9FLlNppUiJsyvkawUlhn7w"/>
+  </assemblyContexts__ComposedStructure>
+  <assemblyContexts__ComposedStructure id="_RqjFgBzMEeWaIpy32zDgDg" entityName="Assembly_gen_behavior_model0 &lt;gen_behavior_model0>">
+    <encapsulatedComponent__AssemblyContext xsi:type="repository:BasicComponent" href="test.repository#_Rnw3QBzMEeWaIpy32zDgDg"/>
+  </assemblyContexts__ComposedStructure>
+  <assemblyContexts__ComposedStructure id="_RqjskRzMEeWaIpy32zDgDg" entityName="Assembly_gen_behavior_model1 &lt;gen_behavior_model1>">
+    <encapsulatedComponent__AssemblyContext xsi:type="repository:BasicComponent" href="test.repository#_RoYiUBzMEeWaIpy32zDgDg"/>
+  </assemblyContexts__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:ProvidedDelegationConnector" id="_JkDMIBOPEeWARpCOSKhBCg" entityName="ProvDelegation Provided__app -> _app" outerProvidedRole_ProvidedDelegationConnector="_I64TUBOPEeWARpCOSKhBCg" assemblyContext_ProvidedDelegationConnector="_j52w3zjNLkVjgw2XtR2Mug">
+    <innerProvidedRole_ProvidedDelegationConnector href="test.repository#_HuhHTk61bDuIfase7OzGpA"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:ProvidedDelegationConnector" id="_RqjskBzMEeWaIpy32zDgDg" entityName="ProvDelegation_gen_behavior_model0" outerProvidedRole_ProvidedDelegationConnector="_RqjFgRzMEeWaIpy32zDgDg" assemblyContext_ProvidedDelegationConnector="_RqjFgBzMEeWaIpy32zDgDg">
+    <innerProvidedRole_ProvidedDelegationConnector href="test.repository#_Rnw3QhzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:ProvidedDelegationConnector" id="_RqjskxzMEeWaIpy32zDgDg" entityName="ProvDelegation_gen_behavior_model1" outerProvidedRole_ProvidedDelegationConnector="_RqjskhzMEeWaIpy32zDgDg" assemblyContext_ProvidedDelegationConnector="_RqjskRzMEeWaIpy32zDgDg">
+    <innerProvidedRole_ProvidedDelegationConnector href="test.repository#_RoYiUhzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:AssemblyConnector" id="_RqkToBzMEeWaIpy32zDgDg" entityName="specj_Assembly_gen_behavior_model0 &lt;gen_behavior_model0>__app" requiringAssemblyContext_AssemblyConnector="_RqjFgBzMEeWaIpy32zDgDg" providingAssemblyContext_AssemblyConnector="_j52w3zjNLkVjgw2XtR2Mug">
+    <providedRole_AssemblyConnector href="test.repository#_HuhHTk61bDuIfase7OzGpA"/>
+    <requiredRole_AssemblyConnector href="test.repository#_RoJRwBzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:AssemblyConnector" id="_Rqk6sBzMEeWaIpy32zDgDg" entityName="Assembly_gen_behavior_model0 &lt;gen_behavior_model0>_Assembly_gen_behavior_model0 &lt;gen_behavior_model0>_ProvidedRole" requiringAssemblyContext_AssemblyConnector="_RqjFgBzMEeWaIpy32zDgDg" providingAssemblyContext_AssemblyConnector="_RqjFgBzMEeWaIpy32zDgDg">
+    <providedRole_AssemblyConnector href="test.repository#_Rnw3QhzMEeWaIpy32zDgDg"/>
+    <requiredRole_AssemblyConnector href="test.repository#_RoMVEBzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:AssemblyConnector" id="_Rqk6sRzMEeWaIpy32zDgDg" entityName="specj_Assembly_gen_behavior_model1 &lt;gen_behavior_model1>__app" requiringAssemblyContext_AssemblyConnector="_RqjskRzMEeWaIpy32zDgDg" providingAssemblyContext_AssemblyConnector="_j52w3zjNLkVjgw2XtR2Mug">
+    <providedRole_AssemblyConnector href="test.repository#_HuhHTk61bDuIfase7OzGpA"/>
+    <requiredRole_AssemblyConnector href="test.repository#_Roa-kBzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:AssemblyConnector" id="_Rqk6shzMEeWaIpy32zDgDg" entityName="Assembly_gen_behavior_model1 &lt;gen_behavior_model1>_Assembly_gen_behavior_model1 &lt;gen_behavior_model1>_ProvidedRole" requiringAssemblyContext_AssemblyConnector="_RqjskRzMEeWaIpy32zDgDg" providingAssemblyContext_AssemblyConnector="_RqjskRzMEeWaIpy32zDgDg">
+    <providedRole_AssemblyConnector href="test.repository#_RoYiUhzMEeWaIpy32zDgDg"/>
+    <requiredRole_AssemblyConnector href="test.repository#_Roa-khzMEeWaIpy32zDgDg"/>
+  </connectors__ComposedStructure>
+  <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="_I64TUBOPEeWARpCOSKhBCg" entityName="Provided__app">
+    <providedInterface__OperationProvidedRole href="test.repository#_FfGLRiIETDb5NwqPSTQLoQ"/>
+  </providedRoles_InterfaceProvidingEntity>
+  <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="_RqjFgRzMEeWaIpy32zDgDg" entityName="Provided_gen_behavior_model0">
+    <providedInterface__OperationProvidedRole href="test.repository#_Rnw3QRzMEeWaIpy32zDgDg"/>
+  </providedRoles_InterfaceProvidingEntity>
+  <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="_RqjskhzMEeWaIpy32zDgDg" entityName="Provided_gen_behavior_model1">
+    <providedInterface__OperationProvidedRole href="test.repository#_RoYiURzMEeWaIpy32zDgDg"/>
+  </providedRoles_InterfaceProvidingEntity>
+</system:System>

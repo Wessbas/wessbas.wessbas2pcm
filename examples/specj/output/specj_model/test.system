@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system:System xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:composition="http://sdq.ipd.uka.de/PalladioComponentModel/Core/Composition/5.0" xmlns:repository="http://sdq.ipd.uka.de/PalladioComponentModel/Repository/5.0" xmlns:system="http://sdq.ipd.uka.de/PalladioComponentModel/System/5.0" id="_P78-0BOOEeW9TJBXTvQ7yQ">
+  <assemblyContexts__ComposedStructure id="_j52w3zjNLkVjgw2XtR2Mug" entityName="specj">
+    <encapsulatedComponent__AssemblyContext xsi:type="repository:CompositeComponent" href="test.repository#_9FLlNppUiJsyvkawUlhn7w"/>
+  </assemblyContexts__ComposedStructure>
+  <connectors__ComposedStructure xsi:type="composition:ProvidedDelegationConnector" id="_JkDMIBOPEeWARpCOSKhBCg" entityName="ProvDelegation Provided__app -> _app" outerProvidedRole_ProvidedDelegationConnector="_I64TUBOPEeWARpCOSKhBCg" assemblyContext_ProvidedDelegationConnector="_j52w3zjNLkVjgw2XtR2Mug">
+    <innerProvidedRole_ProvidedDelegationConnector href="test.repository#_HuhHTk61bDuIfase7OzGpA"/>
+  </connectors__ComposedStructure>
+  <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="_I64TUBOPEeWARpCOSKhBCg" entityName="Provided__app">
+    <providedInterface__OperationProvidedRole href="test.repository#_FfGLRiIETDb5NwqPSTQLoQ"/>
+  </providedRoles_InterfaceProvidingEntity>
+</system:System>
