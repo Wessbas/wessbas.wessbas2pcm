@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ASCII"?>
+<resourceenvironment:ResourceEnvironment xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:resourceenvironment="http://sdq.ipd.uka.de/PalladioComponentModel/ResourceEnvironment/5.0" entityName="PCM_ResourceEnvironment">
+  <linkingResources__ResourceEnvironment id="_P8bf8BOOEeW9TJBXTvQ7yQ" entityName="Connection-specj-DealerDriver" connectedResourceContainers_LinkingResource="_P8VZVBOOEeW9TJBXTvQ7yQ _P8VZVxOOEeW9TJBXTvQ7yQ">
+    <communicationLinkResourceSpecifications_LinkingResource id="_P8bf8ROOEeW9TJBXTvQ7yQ">
+      <communicationLinkResourceType_CommunicationLinkResourceSpecification href="pathmap://PCM_MODELS/Palladio.resourcetype#_o3sScH2AEdyH8uerKnHYug"/>
+      <latency_CommunicationLinkResourceSpecification specification="0"/>
+      <throughput_CommunicationLinkResourceSpecification specification="1000000000"/>
+    </communicationLinkResourceSpecifications_LinkingResource>
+  </linkingResources__ResourceEnvironment>
+  <resourceContainer_ResourceEnvironment id="_P8VZVBOOEeW9TJBXTvQ7yQ" entityName="specj">
+    <activeResourceSpecifications_ResourceContainer id="_P8VZVROOEeW9TJBXTvQ7yQ" numberOfReplicas="6">
+      <schedulingPolicy href="pathmap://PCM_MODELS/Palladio.resourcetype#ProcessorSharing"/>
+      <activeResourceType_ActiveResourceSpecification href="pathmap://PCM_MODELS/Palladio.resourcetype#_oro4gG3fEdy4YaaT-RYrLQ"/>
+      <processingRate_ProcessingResourceSpecification specification="1000"/>
+    </activeResourceSpecifications_ResourceContainer>
+    <activeResourceSpecifications_ResourceContainer id="_P8VZVhOOEeW9TJBXTvQ7yQ">
+      <schedulingPolicy href="pathmap://PCM_MODELS/Palladio.resourcetype#Delay"/>
+      <activeResourceType_ActiveResourceSpecification href="pathmap://PCM_MODELS/Palladio.resourcetype#_nvHX4KkREdyEA_b89s7q9w"/>
+      <processingRate_ProcessingResourceSpecification specification="1000"/>
+    </activeResourceSpecifications_ResourceContainer>
+  </resourceContainer_ResourceEnvironment>
+  <resourceContainer_ResourceEnvironment id="_P8VZVxOOEeW9TJBXTvQ7yQ" entityName="DealerDriver">
+    <activeResourceSpecifications_ResourceContainer id="_P8VZWBOOEeW9TJBXTvQ7yQ">
+      <schedulingPolicy href="pathmap://PCM_MODELS/Palladio.resourcetype#ProcessorSharing"/>
+      <activeResourceType_ActiveResourceSpecification href="pathmap://PCM_MODELS/Palladio.resourcetype#_oro4gG3fEdy4YaaT-RYrLQ"/>
+      <processingRate_ProcessingResourceSpecification specification="1000"/>
+    </activeResourceSpecifications_ResourceContainer>
+    <activeResourceSpecifications_ResourceContainer id="_P8VZWROOEeW9TJBXTvQ7yQ">
+      <schedulingPolicy href="pathmap://PCM_MODELS/Palladio.resourcetype#Delay"/>
+      <activeResourceType_ActiveResourceSpecification href="pathmap://PCM_MODELS/Palladio.resourcetype#_nvHX4KkREdyEA_b89s7q9w"/>
+      <processingRate_ProcessingResourceSpecification specification="1000"/>
+    </activeResourceSpecifications_ResourceContainer>
+  </resourceContainer_ResourceEnvironment>
+</resourceenvironment:ResourceEnvironment>
