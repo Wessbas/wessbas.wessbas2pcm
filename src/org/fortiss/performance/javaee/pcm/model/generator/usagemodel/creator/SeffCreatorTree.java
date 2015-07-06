@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import m4jdsl.Action;
 import m4jdsl.ApplicationState;
@@ -59,12 +60,11 @@ import de.uka.ipd.sdq.pcm.seff.seff_performance.SeffPerformanceFactory;
  * @author voegele
  * 
  */
-public class SeffCreator extends AbstractCreator {
+public class SeffCreatorTree extends AbstractCreator {
 
 	private CreatorTools creatorTools = CreatorTools.getInstance();
 	private ResourceSet thisResourceSet;
 	private Repository thisRepository;
-	HashMap<String, List<GuardedTransition>> guardCombinations;
 
 	/**
 	 * Create seff for the markovState of the behaviorModel.
@@ -162,12 +162,20 @@ public class SeffCreator extends AbstractCreator {
 						.getOutgoingTransitions().size() > 1 && Constants.SET_GUARDS_ACTIONS) {
 					
 					// get guards of markovState 
-					LinkedHashMap<Transition, EList<Guard>> guards = getGuards(seff, behaviorModel, markovState);	
-					
+					LinkedHashMap<Transition, EList<Guard>> guards = getGuards(seff, behaviorModel, markovState);					
+							
 					// get all combinations of guards except the combination all 
-					this.guardCombinations = getCombinations(guards, actions);
-				
-					branchAction = createGuardedBranchAction(markovState, behaviorModel, seff, "", 1, guards);						
+					HashMap<String, List<GuardedTransition>> guardCombinations = getCombinations(guards, actions);
+					
+					TreeMap<String, List<GuardedTransition>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER.reversed());
+					result.putAll(guardCombinations);	    
+								
+					// for each combination create a new guarded transition 
+					for (String combination : result.keySet()) {	
+						List<GuardedTransition> guardedTransitions = guardCombinations.get(combination);
+						GuardedBranchTransition guardedBranchTransition = createGuardedBranchTransition(markovState, behaviorModel, guardedTransitions, seff, combination);		
+						guardedBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
+					}						
 					
 				// in this case guards are not needed	
 				} else {							
@@ -193,29 +201,48 @@ public class SeffCreator extends AbstractCreator {
 	 * @param guardedTransitions
 	 * @return String
 	 */
-	private String getGuardString(final EList<Guard> guards, final boolean istrue) {
+	private String getGuardString(final List<GuardedTransition> guardedTransitionsList) {
 		String guardString = "";	
-	
-		if (!istrue) {
-			guardString = guardString + " NOT ";
-		}			
-		guardString = guardString + " ( ";			
-		for (int s = 0; s < guards.size() ; s++) {						
-			if (guards.get(s).getGuardParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {					
-				if (guards.get(s).isNegate()) {
-					guardString = guardString + guards.get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true";
-				} else {
-					guardString = guardString + guards.get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==false";
+		
+		List<GuardedTransition> guardedTransitions = new ArrayList<GuardedTransition>();
+					
+		for (GuardedTransition guardedTransition : guardedTransitionsList) {
+			if (!guardedTransition.guardIsTrue) {
+				guardedTransitions.add(guardedTransition);
+			}
+		}	
+		
+		for (GuardedTransition guardedTransition : guardedTransitionsList) {
+			if (guardedTransition.guardIsTrue) {
+				guardedTransitions.add(guardedTransition);
+			}
+		}
+		
+			
+		for (int i = 0; i < guardedTransitions.size(); i++) {
+			if (!guardedTransitions.get(i).guardIsTrue) {
+				guardString = guardString + " NOT ";
+			}			
+			guardString = guardString + " ( ";			
+			for (int s = 0; s < guardedTransitions.get(i).getGuards().size() ; s++) {						
+				if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.BOOLEAN) {					
+					if (guardedTransitions.get(i).getGuards().get(s).isNegate()) {
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==true";
+					} else {
+						guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE==false";
+					}				
+				} else if (guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getParameterType() == GuardActionParameterType.INTEGER) {					
+					guardString = guardString + guardedTransitions.get(i).getGuards().get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE >" + guardedTransitions.get(i).getGuards().get(s).getDiffMinimum();					
 				}				
-			} else if (guards.get(s).getGuardParameter().getParameterType() == GuardActionParameterType.INTEGER) {					
-				guardString = guardString + guards.get(s).getGuardParameter().getGuardActionParameterName() + ".VALUE >" + guards.get(s).getDiffMinimum();					
-			}				
-			if (s != guards.size() -1) {
+				if (s != guardedTransitions.get(i).getGuards().size() -1) {
+					guardString = guardString + " AND ";
+				}				
+			}			
+			guardString = guardString + " ) ";		
+			if (i != guardedTransitions.size() -1) {
 				guardString = guardString + " AND ";
-			}				
+			}
 		}			
-		guardString = guardString + " ) ";		
-	
 		return guardString;
 	}
 	
@@ -227,7 +254,7 @@ public class SeffCreator extends AbstractCreator {
 		double size = (double) guards.size();
 		int numberOfCombinations = (int) Math.pow(2, size);
 		HashMap<String, List<GuardedTransition>> guardCombinations = new HashMap<String, List<GuardedTransition>>();
-		for (int i = numberOfCombinations-1; i >= 0; i--) {
+		for (int i = numberOfCombinations-1; i > 0; i--) {
 			String binaryString = addMissingZeros(Integer.toBinaryString(i), (int) size);
 			List<GuardedTransition> guardedTransitionList = new ArrayList<GuardedTransition>();
 			int s = 0;
@@ -338,37 +365,6 @@ public class SeffCreator extends AbstractCreator {
 	}
 	
 	/**
-	 * Create guarded branch action. 
-	 * 
-	 * @param transition
-	 * @param seff
-	 * @param behaviorModel
-	 * @return GuardedBranchTransition
-	 * @throws IOException 
-	 */
-	private BranchAction createGuardedBranchAction(
-			final MarkovState markovState, 
-			final BehaviorModel behaviorModel,
-			final ResourceDemandingSEFF seff,
-			final String name,
-			final int position, 
-			final LinkedHashMap<Transition, EList<Guard>> guards) throws IOException {		
-		
-		// create new branchAction
-		BranchAction branchAction = SeffFactory.eINSTANCE.createBranchAction();	
-		
-		// create guardedBranchTransition true
-		GuardedBranchTransition guardedBranchTransitionTrue = createGuardedBranchTransition(markovState, behaviorModel, seff, new Integer(position), true, name, guards);		
-		guardedBranchTransitionTrue.setBranchAction_AbstractBranchTransition(branchAction);
-				
-		// create guardedBranchTransition true
-		GuardedBranchTransition guardedBranchTransitionFalse = createGuardedBranchTransition(markovState, behaviorModel, seff, new Integer(position), false, name, guards);		
-		guardedBranchTransitionFalse.setBranchAction_AbstractBranchTransition(branchAction);
-			
-		return branchAction;
-	}
-	
-	/**
 	 * Create guarded branch transition. 
 	 * 
 	 * @param transition
@@ -380,23 +376,12 @@ public class SeffCreator extends AbstractCreator {
 	private GuardedBranchTransition createGuardedBranchTransition(
 			final MarkovState markovState, 
 			final BehaviorModel behaviorModel,
+			final List<GuardedTransition> guardedTransitions,
 			final ResourceDemandingSEFF seff,
-			final int position,
-			final boolean isTrue, 
-			final String name,
-			final LinkedHashMap<Transition, EList<Guard>> guards) throws IOException {
-		
-		GuardedBranchTransition guardedBranchTransition = SeffFactory.eINSTANCE.createGuardedBranchTransition();		
-		guardedBranchTransition.setBranchCondition_GuardedBranchTransition(createPCMRandomVariable(getGuardString(guards.get(markovState.getOutgoingTransitions().get(position-1)),isTrue)));	
-		
-		String newString = name;
-		if (isTrue) {
-			newString += "1";
-		} else {
-			newString += "0";
-		}
-		
-		guardedBranchTransition.setEntityName(newString);		
+			final String guardName) throws IOException {
+		GuardedBranchTransition guardedBranchTransition = SeffFactory.eINSTANCE.createGuardedBranchTransition();
+		guardedBranchTransition.setBranchCondition_GuardedBranchTransition(createPCMRandomVariable(getGuardString(guardedTransitions)));	
+		guardedBranchTransition.setEntityName(guardName);
 		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
 				.createResourceDemandingBehaviour();
 		StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
@@ -404,14 +389,7 @@ public class SeffCreator extends AbstractCreator {
 		startAction.setSuccessor_AbstractAction(stopAction);
 		stopAction.setPredecessor_AbstractAction(startAction);
 		guardedBranchTransition.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);		
-		
-		BranchAction branchAction;
-		if (position < markovState.getOutgoingTransitions().size()) {
-			branchAction = createGuardedBranchAction(markovState, behaviorModel, seff, newString, new Integer(position+1), guards);
-		} else {		
-			branchAction = createProbabilisticBranchAction(markovState, this.guardCombinations.get(newString), behaviorModel, seff);
-		}
-		
+		BranchAction branchAction = createProbabilisticBranchAction(markovState, guardedTransitions, behaviorModel, seff);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(branchAction);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(startAction);
@@ -420,9 +398,7 @@ public class SeffCreator extends AbstractCreator {
 		branchAction.setSuccessor_AbstractAction(stopAction);
 		stopAction.setPredecessor_AbstractAction(branchAction);
 		return guardedBranchTransition;
-		
 	}
-	
 	
 	/**
 	 * @param markovState
@@ -445,12 +421,6 @@ public class SeffCreator extends AbstractCreator {
 			}
 		}
 		
-		if (sumProbability == 0) {
-			ProbabilisticBranchTransition probabilisticBranchTransition = createEmptyProbabilisticBranchTransition();
-			probabilisticBranchTransition.setBranchAction_AbstractBranchTransition(branchAction);
-			return branchAction;
-		}
-		
 		for (GuardedTransition guardedTransition:guardedTransitions) {
 			if (guardedTransition.guardIsTrue) {
 				ProbabilisticBranchTransition probabilisticBranchTransition = 
@@ -459,38 +429,6 @@ public class SeffCreator extends AbstractCreator {
 			}
 		}
 		return branchAction;
-	}
-	
-	/**
-	 * Create a new probabilisticBranchTransition for each outgoing transition
-	 * of the markovState.
-	 * 
-	 * @param transition
-	 * @param seff
-	 * @param behaviorModel
-	 * @param first
-	 * @return ProbabilisticBranchTransition
-	 * @throws IOException
-	 */
-	private ProbabilisticBranchTransition createEmptyProbabilisticBranchTransition() throws IOException {
-
-		ProbabilisticBranchTransition probabilisticBranchTransition = SeffFactory.eINSTANCE
-				.createProbabilisticBranchTransition();
-		ResourceDemandingBehaviour resourceDemandingBehaviour = SeffFactory.eINSTANCE
-				.createResourceDemandingBehaviour();
-
-		StartAction startAction = SeffFactory.eINSTANCE.createStartAction();
-		StopAction stopAction = SeffFactory.eINSTANCE.createStopAction();
-		resourceDemandingBehaviour.getSteps_Behaviour().add(startAction);
-		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
-		
-		startAction.setSuccessor_AbstractAction(stopAction);			
-	
-		probabilisticBranchTransition
-				.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);
-		probabilisticBranchTransition.setBranchProbability(1);
-		
-		return probabilisticBranchTransition;
 	}
 
 	/**
@@ -520,7 +458,7 @@ public class SeffCreator extends AbstractCreator {
 		StopAction stopAction = SeffFactory.eINSTANCE.createStopAction();
 		resourceDemandingBehaviour.getSteps_Behaviour().add(startAction);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(stopAction);
-			
+
 		// add thinkTime of transition as internal action with delay
 		InternalAction internalAction = createInternalAction(transition);
 		resourceDemandingBehaviour.getSteps_Behaviour().add(internalAction);
@@ -573,7 +511,6 @@ public class SeffCreator extends AbstractCreator {
 				.setBranchBehaviour_BranchTransition(resourceDemandingBehaviour);
 		probabilisticBranchTransition.setBranchProbability(transition
 				.getProbability() * adjustfactor);
-		
 		return probabilisticBranchTransition;
 	}
 
@@ -629,14 +566,12 @@ public class SeffCreator extends AbstractCreator {
 			throws IOException {
 		InternalAction internalAction = SeffFactory.eINSTANCE
 				.createInternalAction();
-		
 		final NormallyDistributedThinkTime normallyDistributedThinkTime = (NormallyDistributedThinkTime) transition
 				.getThinkTime();
 		internalAction.getResourceDemand_Action().add(
 				getParametricResourceDemand(thisResourceSet, "DELAY",
 						normallyDistributedThinkTime.getMean(),
 						normallyDistributedThinkTime.getDeviation()));
-		
 		return internalAction;
 	}
 
