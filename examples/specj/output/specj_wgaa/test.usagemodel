@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="ASCII"?>
+<usagemodel:UsageModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stoex="http://sdq.ipd.uka.de/StochasticExpressions/1.0" xmlns:usagemodel="http://sdq.ipd.uka.de/PalladioComponentModel/UsageModel/5.0">
+  <usageScenario_UsageModel id="_Uub3ACkyEeWnefvB77w_rA" entityName="GeneratedUsageScenario">
+    <scenarioBehaviour_UsageScenario id="_UudFICkyEeWnefvB77w_rA" entityName="DefaultScenario">
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_UudsMCkyEeWnefvB77w_rA" successor="_UueTQCkyEeWnefvB77w_rA"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_UudsMSkyEeWnefvB77w_rA" predecessor="_UueTQCkyEeWnefvB77w_rA"/>
+      <actions_ScenarioBehaviour xsi:type="usagemodel:Branch" id="_UueTQCkyEeWnefvB77w_rA" entityName="BehaviorMix" successor="_UudsMSkyEeWnefvB77w_rA" predecessor="_UudsMCkyEeWnefvB77w_rA">
+        <branchTransitions_Branch>
+          <branchedBehaviour_BranchTransition id="_UueTQSkyEeWnefvB77w_rA">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_UueTQikyEeWnefvB77w_rA" successor="_Uue6USkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_UueTQykyEeWnefvB77w_rA" predecessor="_Uue6USkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_Uue6USkyEeWnefvB77w_rA" entityName="login" successor="_UueTQykyEeWnefvB77w_rA" predecessor="_UueTQikyEeWnefvB77w_rA">
+              <providedRole_EntryLevelSystemCall href="test.system#_UtNvBykyEeWnefvB77w_rA"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_Usc6BikyEeWnefvB77w_rA"/>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="login"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="inventory"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitydeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitypurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartdeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartpurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch branchProbability="1.0">
+          <branchedBehaviour_BranchTransition id="_UufhYCkyEeWnefvB77w_rA">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_UufhYSkyEeWnefvB77w_rA" successor="_UufhZCkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_UufhYikyEeWnefvB77w_rA" predecessor="_UufhZCkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_UufhZCkyEeWnefvB77w_rA" entityName="login" successor="_UufhYikyEeWnefvB77w_rA" predecessor="_UufhYSkyEeWnefvB77w_rA">
+              <providedRole_EntryLevelSystemCall href="test.system#_UtNvBCkyEeWnefvB77w_rA"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_UsAORykyEeWnefvB77w_rA"/>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="login"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="inventory"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitydeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitypurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartdeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartpurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+        <branchTransitions_Branch>
+          <branchedBehaviour_BranchTransition id="_UufhZSkyEeWnefvB77w_rA">
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Start" id="_UufhZikyEeWnefvB77w_rA" successor="_UufhaSkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:Stop" id="_UufhZykyEeWnefvB77w_rA" predecessor="_UufhaSkyEeWnefvB77w_rA"/>
+            <actions_ScenarioBehaviour xsi:type="usagemodel:EntryLevelSystemCall" id="_UufhaSkyEeWnefvB77w_rA" entityName="login" successor="_UufhZykyEeWnefvB77w_rA" predecessor="_UufhZikyEeWnefvB77w_rA">
+              <providedRole_EntryLevelSystemCall href="test.system#_UtNvASkyEeWnefvB77w_rA"/>
+              <operationSignature__EntryLevelSystemCall href="test.repository#_UrtTJikyEeWnefvB77w_rA"/>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="login"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="false"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="inventory"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitydeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantitypurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="View_Items_quantityremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartdeferorder"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartpurchasecart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartshoppingcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartclearcart"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+              <inputParameterUsages_EntryLevelSystemCall>
+                <variableCharacterisation_VariableUsage type="VALUE">
+                  <specification_VariableCharacterisation specification="0"/>
+                </variableCharacterisation_VariableUsage>
+                <namedReference__VariableUsage xsi:type="stoex:VariableReference" referenceName="Add_to_Cartremove"/>
+              </inputParameterUsages_EntryLevelSystemCall>
+            </actions_ScenarioBehaviour>
+          </branchedBehaviour_BranchTransition>
+        </branchTransitions_Branch>
+      </actions_ScenarioBehaviour>
+    </scenarioBehaviour_UsageScenario>
+    <workload_UsageScenario xsi:type="usagemodel:ClosedWorkload" population="800">
+      <thinkTime_ClosedWorkload specification="0"/>
+    </workload_UsageScenario>
+  </usageScenario_UsageModel>
+</usagemodel:UsageModel>

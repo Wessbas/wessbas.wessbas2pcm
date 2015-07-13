@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<allocation:Allocation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:allocation="http://sdq.ipd.uka.de/PalladioComponentModel/Allocation/5.0" id="_P8VZUBOOEeW9TJBXTvQ7yQ">
+  <targetResourceEnvironment_Allocation href="test.resourceenvironment#/"/>
+  <system_Allocation href="test.system#_P78-0BOOEeW9TJBXTvQ7yQ"/>
+  <allocationContexts_Allocation id="_P8VZUROOEeW9TJBXTvQ7yQ" entityName="specj">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_P8VZVBOOEeW9TJBXTvQ7yQ"/>
+    <assemblyContext_AllocationContext href="test.system#_j52w3zjNLkVjgw2XtR2Mug"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_Utgp-ikyEeWnefvB77w_rA" entityName="Assembly_gen_behavior_model0 &lt;gen_behavior_model0>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_P8VZVxOOEeW9TJBXTvQ7yQ"/>
+    <assemblyContext_AllocationContext href="test.system#_UtNvACkyEeWnefvB77w_rA"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_Utgp-ykyEeWnefvB77w_rA" entityName="Assembly_gen_behavior_model1 &lt;gen_behavior_model1>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_P8VZVxOOEeW9TJBXTvQ7yQ"/>
+    <assemblyContext_AllocationContext href="test.system#_UtNvAykyEeWnefvB77w_rA"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_Utgp_CkyEeWnefvB77w_rA" entityName="Assembly_gen_behavior_model2 &lt;gen_behavior_model2>">
+    <resourceContainer_AllocationContext href="test.resourceenvironment#_P8VZVxOOEeW9TJBXTvQ7yQ"/>
+    <assemblyContext_AllocationContext href="test.system#_UtNvBikyEeWnefvB77w_rA"/>
+  </allocationContexts_Allocation>
+</allocation:Allocation>
