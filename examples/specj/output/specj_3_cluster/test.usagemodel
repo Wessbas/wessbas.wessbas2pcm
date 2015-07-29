@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ASCII"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <usagemodel:UsageModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stoex="http://sdq.ipd.uka.de/StochasticExpressions/1.0" xmlns:usagemodel="http://sdq.ipd.uka.de/PalladioComponentModel/UsageModel/5.0">
   <usageScenario_UsageModel id="_qrIwYBeCEeWI5590_6kiNg" entityName="GeneratedUsageScenario">
     <scenarioBehaviour_UsageScenario id="_qrJXcBeCEeWI5590_6kiNg" entityName="DefaultScenario">

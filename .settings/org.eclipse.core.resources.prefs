@@ -1,3 +1,5 @@
 eclipse.preferences.version=1
 encoding//examples/specj/output/specjPCM_Paper/default.repository=UTF-8
 encoding//examples/specj/output/specjPCM_Paper/default.repository_diagram=UTF-8
+encoding//examples/specj/output/specj_3_cluster/test.repository_diagram=UTF-8
+encoding//examples/specj/output/specj_3_cluster/test.usagemodel_diagram=UTF-8
