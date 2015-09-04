@@ -84,10 +84,9 @@ public class UsagemodelCreator extends AbstractCreator {
 		Stop stop = UsagemodelFactory.eINSTANCE.createStop();
 		Branch branch = createBranch();
 
-		// add elements to scenarioBehavior
-		start.setScenarioBehaviour_AbstractUserAction(scenarioBehaviour);
-		stop.setScenarioBehaviour_AbstractUserAction(scenarioBehaviour);
-		branch.setScenarioBehaviour_AbstractUserAction(scenarioBehaviour);
+		scenarioBehaviour.getActions_ScenarioBehaviour().add(start);
+		scenarioBehaviour.getActions_ScenarioBehaviour().add(stop);
+		scenarioBehaviour.getActions_ScenarioBehaviour().add(branch);
 
 		// connect Elements
 		start.setSuccessor(branch);
@@ -209,7 +208,7 @@ public class UsagemodelCreator extends AbstractCreator {
 		sb.getActions_ScenarioBehaviour().add(stop);
 
 		EntryLevelSystemCall entryLevelSystemCall = createEntryLevelSystemCall(behaviorModel);
-		entryLevelSystemCall.setScenarioBehaviour_AbstractUserAction(sb);
+		sb.getActions_ScenarioBehaviour().add(entryLevelSystemCall);
 
 		// connect element
 		start.setSuccessor(entryLevelSystemCall);
